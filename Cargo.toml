@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = ["pretty_graphql"]
+
+[profile.release]
+lto = true
+strip = "debuginfo"

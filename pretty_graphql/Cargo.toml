@@ -1,0 +1,23 @@
+[package]
+name = "pretty_graphql"
+version = "0.0.0"
+edition = "2021"
+authors = ["Pig Fang <g-plane@hotmail.com>"]
+description = "GraphQL formatter."
+repository = "https://github.com/g-plane/pretty_graphql"
+license = "MIT"
+keywords = ["graphql", "formatter"]
+exclude = ["/tests"]
+
+[dependencies]
+apollo-parser = "0.8"
+serde = { version = "1.0", features = ["derive"], optional = true }
+tiny_pretty = "0.2"
+
+[dev-dependencies]
+insta = { version = "1.39", features = ["glob"] }
+similar-asserts = "1.5"
+toml = "0.8"
+
+[features]
+config_serde = ["serde"]
