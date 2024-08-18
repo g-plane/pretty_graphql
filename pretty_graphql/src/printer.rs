@@ -186,7 +186,7 @@ impl DocGen for Field {
             trivias = format_trivias_after_node(&alias, ctx);
         }
         if let Some(name) = self.name() {
-            if trivias.is_empty() {
+            if trivias.is_empty() && !docs.is_empty() {
                 docs.push(Doc::space());
             } else {
                 docs.append(&mut trivias);
@@ -263,8 +263,9 @@ impl DocGen for InlineFragment {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(5);
         let mut trivias = vec![];
+
+        docs.push(Doc::text("..."));
         if let Some(dotdotdot) = self.dotdotdot_token() {
-            docs.push(Doc::text("..."));
             trivias = format_trivias_after_token(&SyntaxElement::Token(dotdotdot), ctx);
         }
         if let Some(type_condition) = self.type_condition() {
@@ -455,7 +456,7 @@ impl DocGen for OperationDefinition {
             trivias = format_trivias_after_node(&directives, ctx);
         }
         if let Some(selection_set) = self.selection_set() {
-            if trivias.is_empty() {
+            if trivias.is_empty() && !docs.is_empty() {
                 docs.push(Doc::space());
             } else {
                 docs.append(&mut trivias);
@@ -524,8 +525,8 @@ impl DocGen for TypeCondition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(3);
         let mut trivias = vec![];
+        docs.push(Doc::text("on"));
         if let Some(on) = self.on_token() {
-            docs.push(Doc::text("on"));
             trivias = format_trivias_after_token(&SyntaxElement::Token(on), ctx)
         }
         if let Some(named_type) = self.named_type() {
@@ -855,7 +856,7 @@ fn format_trivias(
     let mut docs = vec![];
     let mut trivias = it
         .skip(1)
-        .skip_while(|element| element.kind() == SyntaxKind::WHITESPACE)
+        // .skip_while(|element| element.kind() == SyntaxKind::WHITESPACE)
         .map_while(|element| match element {
             SyntaxElement::Token(token)
                 if token.kind() == SyntaxKind::WHITESPACE
