@@ -12,6 +12,74 @@ pub(super) trait DocGen {
     fn doc(&self, ctx: &Ctx) -> Doc<'static>;
 }
 
+impl DocGen for Argument {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(4);
+        let mut trivias = vec![];
+        if let Some(name) = self.name() {
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(colon) = self.colon_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text(":"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+        }
+        if let Some(value) = self.value() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(value.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for Arguments {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        format_delimiters(
+            format_optional_comma_separated_list(self, self.arguments(), Doc::line_or_space(), ctx),
+            ("(", ")"),
+            Doc::line_or_nil(),
+            self.l_paren_token().map(SyntaxElement::Token),
+            ctx,
+        )
+        .group()
+    }
+}
+
+impl DocGen for BooleanValue {
+    fn doc(&self, _: &Ctx) -> Doc<'static> {
+        Doc::text(self.source_string())
+    }
+}
+
+impl DocGen for DefaultValue {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(3);
+        docs.push(Doc::text("="));
+        let mut trivias = if let Some(eq) = self.eq_token() {
+            format_trivias_after_token(&SyntaxElement::Token(eq), ctx)
+        } else {
+            vec![]
+        };
+
+        if let Some(default_value) = self.value() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(default_value.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
 impl DocGen for Definition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         match self {
@@ -36,11 +104,64 @@ impl DocGen for Definition {
     }
 }
 
+impl DocGen for Directive {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(4);
+
+        docs.push(Doc::text("@"));
+        if let Some(at) = self.at_token() {
+            docs.append(&mut format_trivias_after_token(
+                &SyntaxElement::Token(at),
+                ctx,
+            ));
+        }
+
+        if let Some(name) = self.name() {
+            docs.push(name.doc(ctx));
+            docs.append(&mut format_trivias_after_node(&name, ctx));
+        }
+
+        if let Some(arguments) = self.arguments() {
+            docs.push(arguments.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for Directives {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        format_optional_comma_separated_list(self, self.directives(), Doc::line_or_space(), ctx)
+    }
+}
+
 impl DocGen for Document {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = format_line_break_separated_list::<_, Definition, true>(self, ctx);
         docs.push(Doc::hard_line());
         Doc::list(docs)
+    }
+}
+
+impl DocGen for EnumValue {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if let Some(name) = self.name() {
+            name.doc(ctx)
+        } else {
+            Doc::nil()
+        }
+    }
+}
+
+impl DocGen for FloatValue {
+    fn doc(&self, _: &Ctx) -> Doc<'static> {
+        Doc::text(self.source_string())
+    }
+}
+
+impl DocGen for IntValue {
+    fn doc(&self, _: &Ctx) -> Doc<'static> {
+        Doc::text(self.source_string())
     }
 }
 
@@ -99,41 +220,51 @@ impl DocGen for NonNullType {
     }
 }
 
+impl DocGen for NullValue {
+    fn doc(&self, _: &Ctx) -> Doc<'static> {
+        Doc::text("null")
+    }
+}
+
 impl DocGen for OperationDefinition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
         if let Some(operation_type) = self.operation_type() {
             docs.push(operation_type.doc(ctx));
-            let mut trivias = format_trivias_after_node(&operation_type, ctx);
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            trivias = format_trivias_after_node(&operation_type, ctx);
         }
         if let Some(name) = self.name() {
-            docs.push(name.doc(ctx));
-            let mut trivias = format_trivias_after_node(&name, ctx);
             if trivias.is_empty() {
                 docs.push(Doc::space());
             } else {
                 docs.append(&mut trivias);
             }
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
         }
         if let Some(variable_defs) = self.variable_definitions() {
-            docs.push(variable_defs.doc(ctx));
-            let mut trivias = format_trivias_after_node(&variable_defs, ctx);
             if trivias.is_empty() {
                 docs.push(Doc::space());
             } else {
                 docs.append(&mut trivias);
             }
+            docs.push(variable_defs.doc(ctx));
+            trivias = format_trivias_after_node(&variable_defs, ctx);
         }
         if let Some(directives) = self.directives() {
-            todo!()
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            trivias = format_trivias_after_node(&directives, ctx);
         }
         if let Some(selection_set) = self.selection_set() {
-            //
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
         }
 
         Doc::list(docs)
@@ -154,12 +285,34 @@ impl DocGen for OperationType {
     }
 }
 
+impl DocGen for StringValue {
+    fn doc(&self, _: &Ctx) -> Doc<'static> {
+        Doc::text(self.source_string())
+    }
+}
+
 impl DocGen for Type {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         match self {
             Type::NamedType(node) => node.doc(ctx),
             Type::ListType(node) => node.doc(ctx),
             Type::NonNullType(node) => node.doc(ctx),
+        }
+    }
+}
+
+impl DocGen for Value {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        match self {
+            Value::Variable(node) => node.doc(ctx),
+            Value::StringValue(node) => node.doc(ctx),
+            Value::FloatValue(node) => node.doc(ctx),
+            Value::IntValue(node) => node.doc(ctx),
+            Value::BooleanValue(node) => node.doc(ctx),
+            Value::NullValue(node) => node.doc(ctx),
+            Value::EnumValue(node) => node.doc(ctx),
+            Value::ListValue(_) => todo!(),
+            Value::ObjectValue(_) => todo!(),
         }
     }
 }
@@ -177,33 +330,39 @@ impl DocGen for Variable {
 impl DocGen for VariableDefinition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(6);
+        let mut trivias = vec![];
         if let Some(var) = self.variable() {
             docs.push(var.doc(ctx));
-            docs.append(&mut format_trivias_after_node(&var, ctx));
+            trivias = format_trivias_after_node(&var, ctx);
         }
         if let Some(colon) = self.colon_token() {
+            docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            let mut trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
         }
         if let Some(ty) = self.ty() {
-            docs.push(ty.doc(ctx));
-            let mut trivias = format_trivias_after_node(&ty, ctx);
             if trivias.is_empty() {
                 docs.push(Doc::space());
             } else {
                 docs.append(&mut trivias);
             }
+            docs.push(ty.doc(ctx));
+            trivias = format_trivias_after_node(&ty, ctx);
         }
         if let Some(default_value) = self.default_value() {
-            todo!();
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(default_value.doc(ctx));
+            trivias = format_trivias_after_node(&default_value, ctx);
         }
         if let Some(directives) = self.directives() {
-            todo!();
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
         }
 
         Doc::list(docs)
@@ -212,42 +371,19 @@ impl DocGen for VariableDefinition {
 
 impl DocGen for VariableDefinitions {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        let mut docs = Vec::with_capacity(5);
-
-        docs.push(Doc::text("("));
-        let paren_space = Doc::line_or_nil();
-
-        if let Some(l_paren) = self.l_paren_token() {
-            if let Some(token) = l_paren
-                .next_token()
-                .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
-            {
-                if token.text().contains(['\n', '\r']) {
-                    docs.push(Doc::hard_line());
-                } else {
-                    docs.push(paren_space.clone());
-                }
-                let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
-                docs.append(&mut trivia_docs);
-            } else {
-                docs.push(paren_space.clone());
-                let mut trivia_docs =
-                    format_trivias_after_token(&SyntaxElement::Token(l_paren), ctx);
-                docs.append(&mut trivia_docs);
-            }
-        }
-
-        docs.push(format_optional_comma_separated_list(
-            self,
-            self.variable_definitions(),
+        format_delimiters(
+            format_optional_comma_separated_list(
+                self,
+                self.variable_definitions(),
+                Doc::line_or_space(),
+                ctx,
+            ),
+            ("(", ")"),
+            Doc::line_or_nil(),
+            self.l_paren_token().map(SyntaxElement::Token),
             ctx,
-        ));
-
-        Doc::list(docs)
-            .nest(ctx.indent_width)
-            .append(paren_space)
-            .append(Doc::text(")"))
-            .group()
+        )
+        .group()
     }
 }
 
@@ -309,6 +445,7 @@ where
 fn format_optional_comma_separated_list<N, Entry>(
     node: &N,
     entries: CstChildren<Entry>,
+    separator: Doc<'static>,
     ctx: &Ctx,
 ) -> Doc<'static>
 where
@@ -357,7 +494,7 @@ where
                     ctx,
                 );
                 if trivia_docs.is_empty() {
-                    docs.push(Doc::hard_line());
+                    docs.push(separator.clone());
                 } else {
                     docs.append(&mut trivia_docs);
                 }
@@ -391,6 +528,45 @@ where
         }
     }
     Doc::list(docs)
+}
+
+fn format_delimiters(
+    body: Doc<'static>,
+    delim: (&'static str, &'static str),
+    space: Doc<'static>,
+    open: Option<SyntaxElement>,
+    ctx: &Ctx,
+) -> Doc<'static> {
+    let mut docs = Vec::with_capacity(5);
+
+    docs.push(Doc::text(delim.0));
+
+    if let Some(open) = open.and_then(|open| open.into_token()) {
+        if let Some(token) = open
+            .next_token()
+            .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
+        {
+            if token.text().contains(['\n', '\r']) {
+                docs.push(Doc::hard_line());
+            } else {
+                docs.push(space.clone());
+            }
+            let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
+            docs.append(&mut trivia_docs);
+        } else {
+            docs.push(space.clone());
+            let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(open), ctx);
+            docs.append(&mut trivia_docs);
+        }
+    }
+
+    docs.push(body);
+
+    Doc::list(docs)
+        .nest(ctx.indent_width)
+        .append(space)
+        .append(Doc::text(delim.1))
+        .group()
 }
 
 fn format_comment(text: String, ctx: &Ctx) -> Doc<'static> {
