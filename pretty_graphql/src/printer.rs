@@ -12,6 +12,21 @@ pub(super) trait DocGen {
     fn doc(&self, ctx: &Ctx) -> Doc<'static>;
 }
 
+impl DocGen for Alias {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(3);
+        let mut trivias = vec![];
+        if let Some(name) = self.name() {
+            docs.push(name.doc(ctx));
+            trivias.append(&mut format_trivias_after_node(&name, ctx));
+        }
+
+        docs.push(Doc::text(":"));
+        docs.append(&mut trivias);
+        Doc::list(docs)
+    }
+}
+
 impl DocGen for Argument {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(4);
@@ -40,14 +55,23 @@ impl DocGen for Argument {
 
 impl DocGen for Arguments {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_delimiters(
-            format_optional_comma_separated_list(self, self.arguments(), Doc::line_or_space(), ctx),
-            ("(", ")"),
-            Doc::line_or_nil(),
-            self.l_paren_token().map(SyntaxElement::Token),
-            ctx,
-        )
-        .group()
+        if is_empty_delimiter(self) {
+            Doc::text("()")
+        } else {
+            format_delimiters(
+                format_optional_comma_separated_list(
+                    self,
+                    self.arguments(),
+                    Doc::line_or_space(),
+                    ctx,
+                ),
+                ("(", ")"),
+                Doc::line_or_nil(),
+                self.l_paren_token().map(SyntaxElement::Token),
+                ctx,
+            )
+            .group()
+        }
     }
 }
 
@@ -153,9 +177,120 @@ impl DocGen for EnumValue {
     }
 }
 
+impl DocGen for Field {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(alias) = self.alias() {
+            docs.push(alias.doc(ctx));
+            trivias = format_trivias_after_node(&alias, ctx);
+        }
+        if let Some(name) = self.name() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(arguments) = self.arguments() {
+            docs.append(&mut trivias);
+            docs.push(arguments.doc(ctx));
+            trivias = format_trivias_after_node(&arguments, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            trivias = format_trivias_after_node(&directives, ctx);
+        }
+        if let Some(selection_set) = self.selection_set() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(selection_set.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
 impl DocGen for FloatValue {
     fn doc(&self, _: &Ctx) -> Doc<'static> {
         Doc::text(self.source_string())
+    }
+}
+
+impl DocGen for FragmentName {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if let Some(name) = self.name() {
+            name.doc(ctx)
+        } else {
+            Doc::nil()
+        }
+    }
+}
+
+impl DocGen for FragmentSpread {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(dotdotdot) = self.dotdotdot_token() {
+            docs.push(Doc::text("..."));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(dotdotdot), ctx);
+        }
+        if let Some(fragment_name) = self.fragment_name() {
+            docs.append(&mut trivias);
+            docs.push(fragment_name.doc(ctx));
+            trivias = format_trivias_after_node(&fragment_name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for InlineFragment {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(dotdotdot) = self.dotdotdot_token() {
+            docs.push(Doc::text("..."));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(dotdotdot), ctx);
+        }
+        if let Some(type_condition) = self.type_condition() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(type_condition.doc(ctx));
+        }
+        if let Some(directives) = self.directives() {
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+        }
+        if let Some(selection_set) = self.selection_set() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(selection_set.doc(ctx));
+        }
+
+        Doc::list(docs)
     }
 }
 
@@ -167,23 +302,35 @@ impl DocGen for IntValue {
 
 impl DocGen for ListType {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        let mut docs = Vec::with_capacity(3);
-        docs.push(Doc::text("["));
-        if let Some(l_brack) = self.l_brack_token() {
-            docs.append(&mut format_trivias_after_token(
-                &SyntaxElement::Token(l_brack),
+        format_delimiters(
+            self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil),
+            ("[", "]"),
+            Doc::line_or_nil(),
+            self.l_brack_token().map(SyntaxElement::Token),
+            ctx,
+        )
+    }
+}
+
+impl DocGen for ListValue {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if is_empty_delimiter(self) {
+            Doc::text("[]")
+        } else {
+            format_delimiters(
+                format_optional_comma_separated_list(
+                    self,
+                    self.values(),
+                    Doc::line_or_space(),
+                    ctx,
+                ),
+                ("[", "]"),
+                Doc::line_or_nil(),
+                self.l_brack_token().map(SyntaxElement::Token),
                 ctx,
-            ));
+            )
+            .group()
         }
-
-        if let Some(ty) = self.ty() {
-            docs.push(ty.doc(ctx));
-            docs.append(&mut format_trivias_after_node(&ty, ctx));
-        }
-
-        docs.push(Doc::text("]"));
-
-        Doc::list(docs)
     }
 }
 
@@ -226,6 +373,54 @@ impl DocGen for NullValue {
     }
 }
 
+impl DocGen for ObjectField {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(4);
+        let mut trivias = vec![];
+        if let Some(name) = self.name() {
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(colon) = self.colon_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text(":"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+        }
+        if let Some(value) = self.value() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(value.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for ObjectValue {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if is_empty_delimiter(self) {
+            Doc::text("{}")
+        } else {
+            format_delimiters(
+                format_optional_comma_separated_list(
+                    self,
+                    self.object_fields(),
+                    Doc::line_or_space(),
+                    ctx,
+                ),
+                ("{", "}"),
+                Doc::line_or_space(),
+                self.l_curly_token().map(SyntaxElement::Token),
+                ctx,
+            )
+            .group()
+        }
+    }
+}
+
 impl DocGen for OperationDefinition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(5);
@@ -265,6 +460,7 @@ impl DocGen for OperationDefinition {
             } else {
                 docs.append(&mut trivias);
             }
+            docs.push(selection_set.doc(ctx));
         }
 
         Doc::list(docs)
@@ -285,6 +481,29 @@ impl DocGen for OperationType {
     }
 }
 
+impl DocGen for Selection {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        match self {
+            Selection::Field(node) => node.doc(ctx),
+            Selection::FragmentSpread(node) => node.doc(ctx),
+            Selection::InlineFragment(node) => node.doc(ctx),
+        }
+    }
+}
+
+impl DocGen for SelectionSet {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        format_delimiters(
+            format_optional_comma_separated_list(self, self.selections(), Doc::hard_line(), ctx),
+            ("{", "}"),
+            Doc::line_or_space(),
+            self.l_curly_token().map(SyntaxElement::Token),
+            ctx,
+        )
+        .group()
+    }
+}
+
 impl DocGen for StringValue {
     fn doc(&self, _: &Ctx) -> Doc<'static> {
         Doc::text(self.source_string())
@@ -301,6 +520,27 @@ impl DocGen for Type {
     }
 }
 
+impl DocGen for TypeCondition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(3);
+        let mut trivias = vec![];
+        if let Some(on) = self.on_token() {
+            docs.push(Doc::text("on"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(on), ctx)
+        }
+        if let Some(named_type) = self.named_type() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(named_type.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
 impl DocGen for Value {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         match self {
@@ -311,8 +551,8 @@ impl DocGen for Value {
             Value::BooleanValue(node) => node.doc(ctx),
             Value::NullValue(node) => node.doc(ctx),
             Value::EnumValue(node) => node.doc(ctx),
-            Value::ListValue(_) => todo!(),
-            Value::ObjectValue(_) => todo!(),
+            Value::ListValue(node) => node.doc(ctx),
+            Value::ObjectValue(node) => node.doc(ctx),
         }
     }
 }
@@ -371,19 +611,23 @@ impl DocGen for VariableDefinition {
 
 impl DocGen for VariableDefinitions {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_delimiters(
-            format_optional_comma_separated_list(
-                self,
-                self.variable_definitions(),
-                Doc::line_or_space(),
+        if is_empty_delimiter(self) {
+            Doc::text("()")
+        } else {
+            format_delimiters(
+                format_optional_comma_separated_list(
+                    self,
+                    self.variable_definitions(),
+                    Doc::line_or_space(),
+                    ctx,
+                ),
+                ("(", ")"),
+                Doc::line_or_nil(),
+                self.l_paren_token().map(SyntaxElement::Token),
                 ctx,
-            ),
-            ("(", ")"),
-            Doc::line_or_nil(),
-            self.l_paren_token().map(SyntaxElement::Token),
-            ctx,
-        )
-        .group()
+            )
+            .group()
+        }
     }
 }
 
@@ -525,6 +769,8 @@ where
                     docs.append(&mut trivia_docs);
                 }
             }
+        } else if entries.peek().is_some() && !has_comment_before_comma {
+            docs.push(separator.clone());
         }
     }
     Doc::list(docs)
@@ -696,4 +942,10 @@ fn should_ignore(node: &SyntaxNode, ctx: &Ctx) -> bool {
             _ => None,
         })
         .is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_whitespace()))
+}
+
+fn is_empty_delimiter<N: CstNode>(node: &N) -> bool {
+    node.syntax()
+        .children_with_tokens()
+        .all(|element| element.kind() != SyntaxKind::COMMENT && element.as_node().is_none())
 }
