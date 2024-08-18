@@ -70,10 +70,19 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(default))]
 /// Configuration related to syntax.
-pub struct LanguageOptions {}
+pub struct LanguageOptions {
+    #[cfg_attr(feature = "config_serde", serde(alias = "formatComments"))]
+    pub format_comments: bool,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "ignoreCommentDirective"))]
+    pub ignore_comment_directive: String,
+}
 
 impl Default for LanguageOptions {
     fn default() -> Self {
-        LanguageOptions {}
+        LanguageOptions {
+            format_comments: false,
+            ignore_comment_directive: "pretty-graphql-ignore".into(),
+        }
     }
 }

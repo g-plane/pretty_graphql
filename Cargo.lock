@@ -149,6 +149,7 @@ version = "0.0.0"
 dependencies = [
  "apollo-parser",
  "insta",
+ "rowan",
  "serde",
  "similar-asserts",
  "tiny_pretty",
