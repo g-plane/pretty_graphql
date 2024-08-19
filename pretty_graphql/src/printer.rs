@@ -132,14 +132,14 @@ impl DocGen for Definition {
             Definition::OperationDefinition(node) => node.doc(ctx),
             Definition::FragmentDefinition(node) => node.doc(ctx),
             Definition::DirectiveDefinition(node) => node.doc(ctx),
-            Definition::SchemaDefinition(_) => todo!(),
+            Definition::SchemaDefinition(node) => node.doc(ctx),
             Definition::ScalarTypeDefinition(_) => todo!(),
             Definition::ObjectTypeDefinition(_) => todo!(),
             Definition::InterfaceTypeDefinition(_) => todo!(),
             Definition::UnionTypeDefinition(_) => todo!(),
             Definition::EnumTypeDefinition(_) => todo!(),
             Definition::InputObjectTypeDefinition(_) => todo!(),
-            Definition::SchemaExtension(_) => todo!(),
+            Definition::SchemaExtension(node) => node.doc(ctx),
             Definition::ScalarTypeExtension(_) => todo!(),
             Definition::ObjectTypeExtension(_) => todo!(),
             Definition::InterfaceTypeExtension(_) => todo!(),
@@ -670,6 +670,132 @@ impl DocGen for OperationType {
         } else {
             Doc::nil()
         }
+    }
+}
+
+impl DocGen for RootOperationTypeDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(6);
+        let mut trivias = vec![];
+        if let Some(operation_type) = self.operation_type() {
+            docs.push(operation_type.doc(ctx));
+            trivias = format_trivias_after_node(&operation_type, ctx);
+        }
+        if let Some(colon) = self.colon_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text(":"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+        }
+        if let Some(named_type) = self.named_type() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(named_type.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for SchemaDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(description) = self.description() {
+            docs.push(description.doc(ctx));
+            trivias = format_trivias_after_node(&description, ctx);
+        }
+        if let Some(schema) = self.schema_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("schema"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(schema), ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+        }
+        if self.l_curly_token().is_some() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(
+                format_delimiters(
+                    format_optional_comma_separated_list(
+                        self,
+                        self.root_operation_type_definitions(),
+                        Doc::hard_line(),
+                        ctx,
+                    ),
+                    ("{", "}"),
+                    Doc::line_or_space(),
+                    (
+                        self.l_curly_token().map(SyntaxElement::Token),
+                        self.r_curly_token().map(SyntaxElement::Token),
+                    ),
+                    ctx,
+                )
+                .group(),
+            );
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for SchemaExtension {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(extend) = self.extend_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text("extend"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+        }
+        if let Some(schema) = self.schema_token() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(Doc::text("schema"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(schema), ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+        }
+        if self.l_curly_token().is_some() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(
+                format_delimiters(
+                    format_optional_comma_separated_list(
+                        self,
+                        self.root_operation_type_definitions(),
+                        Doc::hard_line(),
+                        ctx,
+                    ),
+                    ("{", "}"),
+                    Doc::line_or_space(),
+                    (
+                        self.l_curly_token().map(SyntaxElement::Token),
+                        self.r_curly_token().map(SyntaxElement::Token),
+                    ),
+                    ctx,
+                )
+                .group(),
+            );
+        }
+
+        Doc::list(docs)
     }
 }
 
