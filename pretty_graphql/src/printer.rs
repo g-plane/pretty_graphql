@@ -41,11 +41,8 @@ impl DocGen for Argument {
             trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
         }
         if let Some(value) = self.value() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(value.doc(ctx));
         }
 
@@ -120,11 +117,8 @@ impl DocGen for DefaultValue {
         };
 
         if let Some(default_value) = self.value() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(default_value.doc(ctx));
         }
 
@@ -169,7 +163,6 @@ impl DocGen for Description {
 impl DocGen for Directive {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(4);
-
         docs.push(Doc::text("@"));
         if let Some(at) = self.at_token() {
             docs.append(&mut format_trivias_after_token(
@@ -177,12 +170,10 @@ impl DocGen for Directive {
                 ctx,
             ));
         }
-
         if let Some(name) = self.name() {
             docs.push(name.doc(ctx));
             docs.append(&mut format_trivias_after_node(&name, ctx));
         }
-
         if let Some(arguments) = self.arguments() {
             docs.push(arguments.doc(ctx));
         }
@@ -297,11 +288,10 @@ impl DocGen for Field {
             trivias = format_trivias_after_node(&alias, ctx);
         }
         if let Some(name) = self.name() {
-            if trivias.is_empty() && !docs.is_empty() {
+            if !docs.is_empty() {
                 docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
             }
+            docs.append(&mut trivias);
             docs.push(name.doc(ctx));
             trivias = format_trivias_after_node(&name, ctx);
         }
@@ -311,18 +301,17 @@ impl DocGen for Field {
             trivias = format_trivias_after_node(&arguments, ctx);
         }
         if let Some(directives) = self.directives() {
-            if !trivias.is_empty() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
                 docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
             }
-            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
-            trivias = format_trivias_after_node(&directives, ctx);
         }
         if let Some(selection_set) = self.selection_set() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
         }
 
@@ -345,20 +334,14 @@ impl DocGen for FragmentDefinition {
             trivias = format_trivias_after_token(&SyntaxElement::Token(fragment), ctx);
         }
         if let Some(fragment_name) = self.fragment_name() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(fragment_name.doc(ctx));
             trivias = format_trivias_after_node(&fragment_name, ctx);
         }
         if let Some(type_condition) = self.type_condition() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(type_condition.doc(ctx));
             trivias = format_trivias_after_node(&type_condition, ctx);
         }
@@ -438,17 +421,17 @@ impl DocGen for InlineFragment {
             docs.push(type_condition.doc(ctx));
         }
         if let Some(directives) = self.directives() {
-            if !trivias.is_empty() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
                 docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
             }
-            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
         }
         if let Some(selection_set) = self.selection_set() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
         }
 
@@ -465,11 +448,10 @@ impl DocGen for InputValueDefinition {
             trivias = format_trivias_after_node(&description, ctx);
         }
         if let Some(name) = self.name() {
-            if trivias.is_empty() && !docs.is_empty() {
+            if !docs.is_empty() {
                 docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
             }
+            docs.append(&mut trivias);
             docs.push(name.doc(ctx));
             trivias = format_trivias_after_node(&name, ctx);
         }
@@ -479,28 +461,25 @@ impl DocGen for InputValueDefinition {
             trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
         }
         if let Some(ty) = self.ty() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(ty.doc(ctx));
             trivias = format_trivias_after_node(&ty, ctx);
         }
         if let Some(default_value) = self.default_value() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(default_value.doc(ctx));
             trivias = format_trivias_after_node(&default_value, ctx);
         }
         if let Some(directives) = self.directives() {
-            if !trivias.is_empty() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
                 docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
             }
-            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
         }
 
         Doc::list(docs)
@@ -606,11 +585,8 @@ impl DocGen for ObjectField {
             trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
         }
         if let Some(value) = self.value() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(value.doc(ctx));
         }
 
@@ -652,34 +628,30 @@ impl DocGen for OperationDefinition {
             trivias = format_trivias_after_node(&operation_type, ctx);
         }
         if let Some(name) = self.name() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(name.doc(ctx));
             trivias = format_trivias_after_node(&name, ctx);
         }
         if let Some(variable_defs) = self.variable_definitions() {
-            if !trivias.is_empty() {
-                docs.append(&mut trivias);
-            }
+            docs.append(&mut trivias);
             docs.push(variable_defs.doc(ctx));
             trivias = format_trivias_after_node(&variable_defs, ctx);
         }
         if let Some(directives) = self.directives() {
-            if !trivias.is_empty() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
                 docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
             }
-            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
-            trivias = format_trivias_after_node(&directives, ctx);
         }
         if let Some(selection_set) = self.selection_set() {
-            if trivias.is_empty() && !docs.is_empty() {
+            if !docs.is_empty() {
                 docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
             }
+            docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
         }
 
@@ -752,11 +724,8 @@ impl DocGen for TypeCondition {
             trivias = format_trivias_after_token(&SyntaxElement::Token(on), ctx)
         }
         if let Some(named_type) = self.named_type() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(named_type.doc(ctx));
         }
 
@@ -804,28 +773,25 @@ impl DocGen for VariableDefinition {
             trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
         }
         if let Some(ty) = self.ty() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(ty.doc(ctx));
             trivias = format_trivias_after_node(&ty, ctx);
         }
         if let Some(default_value) = self.default_value() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
             docs.push(default_value.doc(ctx));
             trivias = format_trivias_after_node(&default_value, ctx);
         }
         if let Some(directives) = self.directives() {
-            if !trivias.is_empty() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
                 docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
             }
-            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
         }
 
         Doc::list(docs)
