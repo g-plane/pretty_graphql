@@ -946,9 +946,10 @@ fn format_trivias(
             _ => None,
         })
         .peekable();
-    if trivias
-        .peek()
-        .is_some_and(|token| token.kind() == SyntaxKind::COMMENT)
+    if !skip_first_ws
+        && trivias
+            .peek()
+            .is_some_and(|token| token.kind() == SyntaxKind::COMMENT)
     {
         docs.push(Doc::space());
     }
