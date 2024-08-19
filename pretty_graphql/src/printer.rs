@@ -133,14 +133,14 @@ impl DocGen for Definition {
             Definition::FragmentDefinition(node) => node.doc(ctx),
             Definition::DirectiveDefinition(node) => node.doc(ctx),
             Definition::SchemaDefinition(node) => node.doc(ctx),
-            Definition::ScalarTypeDefinition(_) => todo!(),
+            Definition::ScalarTypeDefinition(node) => node.doc(ctx),
             Definition::ObjectTypeDefinition(_) => todo!(),
             Definition::InterfaceTypeDefinition(_) => todo!(),
             Definition::UnionTypeDefinition(_) => todo!(),
             Definition::EnumTypeDefinition(_) => todo!(),
             Definition::InputObjectTypeDefinition(_) => todo!(),
             Definition::SchemaExtension(node) => node.doc(ctx),
-            Definition::ScalarTypeExtension(_) => todo!(),
+            Definition::ScalarTypeExtension(node) => node.doc(ctx),
             Definition::ObjectTypeExtension(_) => todo!(),
             Definition::InterfaceTypeExtension(_) => todo!(),
             Definition::UnionTypeExtension(_) => todo!(),
@@ -690,6 +690,77 @@ impl DocGen for RootOperationTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(named_type.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for ScalarTypeDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(description) = self.description() {
+            docs.push(description.doc(ctx));
+            trivias = format_trivias_after_node(&description, ctx);
+        }
+        if let Some(scalar) = self.scalar_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("scalar"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(scalar), ctx);
+        }
+        if let Some(name) = self.name() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for ScalarTypeExtension {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(extend) = self.extend_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text("extend"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+        }
+        if let Some(scalar) = self.scalar_token() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(Doc::text("scalar"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(scalar), ctx);
+        }
+        if let Some(name) = self.name() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
         }
 
         Doc::list(docs)
