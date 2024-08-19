@@ -137,7 +137,7 @@ impl DocGen for Definition {
         match self {
             Definition::OperationDefinition(node) => node.doc(ctx),
             Definition::FragmentDefinition(node) => node.doc(ctx),
-            Definition::DirectiveDefinition(_) => todo!(),
+            Definition::DirectiveDefinition(node) => node.doc(ctx),
             Definition::SchemaDefinition(_) => todo!(),
             Definition::ScalarTypeDefinition(_) => todo!(),
             Definition::ObjectTypeDefinition(_) => todo!(),
@@ -191,9 +191,76 @@ impl DocGen for Directive {
     }
 }
 
+impl DocGen for DirectiveDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(description) = self.description() {
+            docs.push(description.doc(ctx));
+            trivias = format_trivias_after_node(&description, ctx);
+        }
+        if let Some(directive) = self.directive_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("directive"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(directive), ctx);
+        }
+        if self.at_token().is_some() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(Doc::text("@"));
+        }
+        if let Some(name) = self.name() {
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(arguments_def) = self.arguments_definition() {
+            docs.append(&mut trivias);
+            docs.push(arguments_def.doc(ctx));
+            trivias = format_trivias_after_node(&arguments_def, ctx);
+        }
+        if let Some(repeatable) = self.repeatable_token() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(Doc::text("repeatable"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(repeatable), ctx);
+        }
+        if let Some(on) = self.on_token() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(Doc::text("on"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(on), ctx);
+        }
+        if let Some(directive_locations) = self.directive_locations() {
+            if trivias.is_empty() {
+                docs.push(
+                    Doc::line_or_space()
+                        .append(directive_locations.doc(ctx))
+                        .group()
+                        .nest(ctx.indent_width),
+                );
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directive_locations.doc(ctx).nest(ctx.indent_width));
+            }
+        }
+
+        Doc::list(docs)
+    }
+}
+
 impl DocGen for DirectiveLocation {
     fn doc(&self, _: &Ctx) -> Doc<'static> {
         Doc::text(self.source_string())
+    }
+}
+
+impl DocGen for DirectiveLocations {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        format_union(self, self.directive_locations(), ctx).group()
     }
 }
 
@@ -954,6 +1021,58 @@ where
             docs.push(separator.clone());
         }
     }
+    Doc::list(docs)
+}
+
+fn format_union<N, Entry>(node: &N, mut entries: CstChildren<Entry>, ctx: &Ctx) -> Doc<'static>
+where
+    N: CstNode,
+    Entry: CstNode + DocGen,
+{
+    let node = node.syntax();
+    let pipes = node
+        .children_with_tokens()
+        .filter_map(|element| match element {
+            SyntaxElement::Token(token) if token.kind() == SyntaxKind::PIPE => Some(token),
+            _ => None,
+        });
+    let mut docs = Vec::with_capacity(4);
+
+    if node
+        .first_token()
+        .is_some_and(|token| token.kind() != SyntaxKind::PIPE)
+    {
+        if let Some(first) = entries.next() {
+            docs.push(Doc::flat_or_break(Doc::nil(), Doc::text("| ")));
+            docs.push(first.doc(ctx));
+            let mut trivias = format_trivias_after_node(&first, ctx);
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+            }
+        }
+    }
+
+    let mut it = entries.zip(pipes).peekable();
+    while let Some((entry, pipe)) = it.next() {
+        docs.push(Doc::text("| "));
+        docs.push(entry.doc(ctx));
+        if it.peek().is_some() {
+            let mut trivias_after_pipe =
+                format_trivias_after_token(&SyntaxElement::Token(pipe), ctx);
+            let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
+            if trivias_after_pipe.is_empty() && trivias_after_node.is_empty() {
+                docs.push(Doc::line_or_space());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias_after_pipe);
+                docs.append(&mut trivias_after_node);
+            }
+        }
+    }
+
     Doc::list(docs)
 }
 
