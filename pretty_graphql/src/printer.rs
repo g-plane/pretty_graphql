@@ -67,7 +67,10 @@ impl DocGen for Arguments {
                 ),
                 ("(", ")"),
                 Doc::line_or_nil(),
-                self.l_paren_token().map(SyntaxElement::Token),
+                (
+                    self.l_paren_token().map(SyntaxElement::Token),
+                    self.r_paren_token().map(SyntaxElement::Token),
+                ),
                 ctx,
             )
             .group()
@@ -307,7 +310,10 @@ impl DocGen for ListType {
             self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil),
             ("[", "]"),
             Doc::line_or_nil(),
-            self.l_brack_token().map(SyntaxElement::Token),
+            (
+                self.l_brack_token().map(SyntaxElement::Token),
+                self.r_brack_token().map(SyntaxElement::Token),
+            ),
             ctx,
         )
     }
@@ -327,7 +333,10 @@ impl DocGen for ListValue {
                 ),
                 ("[", "]"),
                 Doc::line_or_nil(),
-                self.l_brack_token().map(SyntaxElement::Token),
+                (
+                    self.l_brack_token().map(SyntaxElement::Token),
+                    self.r_brack_token().map(SyntaxElement::Token),
+                ),
                 ctx,
             )
             .group()
@@ -414,7 +423,10 @@ impl DocGen for ObjectValue {
                 ),
                 ("{", "}"),
                 Doc::line_or_space(),
-                self.l_curly_token().map(SyntaxElement::Token),
+                (
+                    self.l_curly_token().map(SyntaxElement::Token),
+                    self.r_curly_token().map(SyntaxElement::Token),
+                ),
                 ctx,
             )
             .group()
@@ -440,9 +452,7 @@ impl DocGen for OperationDefinition {
             trivias = format_trivias_after_node(&name, ctx);
         }
         if let Some(variable_defs) = self.variable_definitions() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
+            if !trivias.is_empty() {
                 docs.append(&mut trivias);
             }
             docs.push(variable_defs.doc(ctx));
@@ -498,7 +508,10 @@ impl DocGen for SelectionSet {
             format_optional_comma_separated_list(self, self.selections(), Doc::hard_line(), ctx),
             ("{", "}"),
             Doc::line_or_space(),
-            self.l_curly_token().map(SyntaxElement::Token),
+            (
+                self.l_curly_token().map(SyntaxElement::Token),
+                self.r_curly_token().map(SyntaxElement::Token),
+            ),
             ctx,
         )
         .group()
@@ -624,7 +637,10 @@ impl DocGen for VariableDefinitions {
                 ),
                 ("(", ")"),
                 Doc::line_or_nil(),
-                self.l_paren_token().map(SyntaxElement::Token),
+                (
+                    self.l_paren_token().map(SyntaxElement::Token),
+                    self.r_paren_token().map(SyntaxElement::Token),
+                ),
                 ctx,
             )
             .group()
@@ -712,30 +728,51 @@ where
 
         let comma = commas.next();
         let mut has_comment_before_comma = false;
-        let last_ws_index = comma
-            .as_ref()
-            .and_then(|comma| comma.prev_token())
-            .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
-            .map(|token| token.index());
-        let mut trivia_docs = format_trivias(
-            entry
-                .syntax()
-                .siblings_with_tokens(Direction::Next)
+        let mut has_last_line_break = false;
+        if let Some(next) = entries.peek() {
+            let last_ws_index = comma
+                .as_ref()
+                .and_then(|comma| comma.prev_token())
+                .or_else(|| {
+                    next.syntax()
+                        .prev_sibling_or_token()
+                        .and_then(|element| element.into_token())
+                })
                 .filter(|token| {
-                    last_ws_index
-                        .map(|index| token.index() != index)
-                        .unwrap_or(true)
-                }),
-            &mut has_comment_before_comma,
-            ctx,
-        );
-        docs.append(&mut trivia_docs);
+                    if token.kind() == SyntaxKind::WHITESPACE {
+                        has_last_line_break =
+                            token.text().chars().filter(|c| *c == '\n').count() > 1;
+                        !has_last_line_break
+                    } else {
+                        false
+                    }
+                })
+                .map(|token| token.index());
+            let mut trivia_docs = format_trivias(
+                entry
+                    .syntax()
+                    .siblings_with_tokens(Direction::Next)
+                    .filter(|token| {
+                        last_ws_index
+                            .map(|index| token.index() != index)
+                            .unwrap_or(true)
+                    }),
+                &mut has_comment_before_comma,
+                false,
+                ctx,
+            );
+            docs.append(&mut trivia_docs);
+            if has_comment_before_comma && !has_last_line_break {
+                docs.push(Doc::hard_line());
+            }
+        }
 
         if let Some(comma) = &comma {
             if entries.peek().is_some() {
                 let mut trivia_docs = format_trivias(
                     comma.siblings_with_tokens(Direction::Next),
                     &mut has_comment_before_comma,
+                    false,
                     ctx,
                 );
                 if trivia_docs.is_empty() {
@@ -764,13 +801,14 @@ where
                                 .unwrap_or(true)
                         }),
                     &mut has_comment_before_comma,
+                    false,
                     ctx,
                 );
                 if !trivia_docs.is_empty() {
                     docs.append(&mut trivia_docs);
                 }
             }
-        } else if entries.peek().is_some() && !has_comment_before_comma {
+        } else if entries.peek().is_some() && !has_comment_before_comma && !has_last_line_break {
             docs.push(separator.clone());
         }
     }
@@ -779,16 +817,16 @@ where
 
 fn format_delimiters(
     body: Doc<'static>,
-    delim: (&'static str, &'static str),
+    delim_text: (&'static str, &'static str),
     space: Doc<'static>,
-    open: Option<SyntaxElement>,
+    delim_token: (Option<SyntaxElement>, Option<SyntaxElement>),
     ctx: &Ctx,
 ) -> Doc<'static> {
     let mut docs = Vec::with_capacity(5);
 
-    docs.push(Doc::text(delim.0));
+    docs.push(Doc::text(delim_text.0));
 
-    if let Some(open) = open.and_then(|open| open.into_token()) {
+    if let Some(open) = delim_token.0.and_then(|open| open.into_token()) {
         if let Some(token) = open
             .next_token()
             .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
@@ -809,10 +847,48 @@ fn format_delimiters(
 
     docs.push(body);
 
+    let mut has_comment = false;
+    if let Some(close) = delim_token.1.and_then(|close| close.into_token()) {
+        let last_ws_index = close
+            .prev_token()
+            .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
+            .map(|token| token.index());
+        let last_non_trivia = close
+            .siblings_with_tokens(Direction::Prev)
+            .skip(1)
+            .find(|element| {
+                !matches!(element.kind(), SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
+            });
+        let mut trivias = match last_non_trivia {
+            Some(SyntaxElement::Node(node)) => format_trivias(
+                node.siblings_with_tokens(Direction::Next).filter(|token| {
+                    last_ws_index
+                        .map(|index| token.index() != index)
+                        .unwrap_or(true)
+                }),
+                &mut has_comment,
+                false,
+                ctx,
+            ),
+            Some(SyntaxElement::Token(token)) => format_trivias(
+                token.siblings_with_tokens(Direction::Next).filter(|token| {
+                    last_ws_index
+                        .map(|index| token.index() != index)
+                        .unwrap_or(true)
+                }),
+                &mut has_comment,
+                false,
+                ctx,
+            ),
+            None => vec![],
+        };
+        docs.append(&mut trivias);
+    }
+
     Doc::list(docs)
         .nest(ctx.indent_width)
-        .append(space)
-        .append(Doc::text(delim.1))
+        .append(if has_comment { Doc::hard_line() } else { space })
+        .append(Doc::text(delim_text.1))
         .group()
 }
 
@@ -834,6 +910,7 @@ fn format_trivias_after_node<N: CstNode>(node: &N, ctx: &Ctx) -> Vec<Doc<'static
     format_trivias(
         node.syntax().siblings_with_tokens(Direction::Next),
         &mut _has_comment,
+        true,
         ctx,
     )
 }
@@ -844,6 +921,7 @@ fn format_trivias_after_token(element: &SyntaxElement, ctx: &Ctx) -> Vec<Doc<'st
     format_trivias(
         token.siblings_with_tokens(Direction::Next),
         &mut _has_comment,
+        true,
         ctx,
     )
 }
@@ -851,12 +929,13 @@ fn format_trivias_after_token(element: &SyntaxElement, ctx: &Ctx) -> Vec<Doc<'st
 fn format_trivias(
     it: impl Iterator<Item = SyntaxElement>,
     has_comment: &mut bool,
+    skip_first_ws: bool,
     ctx: &Ctx,
 ) -> Vec<Doc<'static>> {
     let mut docs = vec![];
     let mut trivias = it
         .skip(1)
-        // .skip_while(|element| element.kind() == SyntaxKind::WHITESPACE)
+        .skip_while(|element| skip_first_ws && element.kind() == SyntaxKind::WHITESPACE)
         .map_while(|element| match element {
             SyntaxElement::Token(token)
                 if token.kind() == SyntaxKind::WHITESPACE
