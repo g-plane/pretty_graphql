@@ -1,5 +1,5 @@
 use crate::config::LanguageOptions;
-use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode};
+use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode, S};
 use rowan::Direction;
 use tiny_pretty::Doc;
 
@@ -251,7 +251,7 @@ impl DocGen for DirectiveLocation {
 
 impl DocGen for DirectiveLocations {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_union(self, self.directive_locations(), ctx).group()
+        format_union_like(self, self.directive_locations(), S![|], "|", ctx).group()
     }
 }
 
@@ -1358,7 +1358,7 @@ where
     let mut commas = node
         .children_with_tokens()
         .filter_map(|element| match element {
-            SyntaxElement::Token(token) if token.kind() == SyntaxKind::COMMA => Some(token),
+            SyntaxElement::Token(token) if token.kind() == S![,] => Some(token),
             _ => None,
         });
     while let Some(entry) = entries.next() {
@@ -1454,26 +1454,35 @@ where
     Doc::list(docs)
 }
 
-fn format_union<N, Entry>(node: &N, mut entries: CstChildren<Entry>, ctx: &Ctx) -> Doc<'static>
+fn format_union_like<N, Entry>(
+    node: &N,
+    mut entries: CstChildren<Entry>,
+    sep_token_kind: SyntaxKind,
+    sep_text: &'static str,
+    ctx: &Ctx,
+) -> Doc<'static>
 where
     N: CstNode,
     Entry: CstNode + DocGen,
 {
     let node = node.syntax();
-    let pipes = node
+    let sep_tokens = node
         .children_with_tokens()
         .filter_map(|element| match element {
-            SyntaxElement::Token(token) if token.kind() == SyntaxKind::PIPE => Some(token),
+            SyntaxElement::Token(token) if token.kind() == sep_token_kind => Some(token),
             _ => None,
         });
     let mut docs = Vec::with_capacity(4);
 
     if node
         .first_token()
-        .is_some_and(|token| token.kind() != SyntaxKind::PIPE)
+        .is_some_and(|token| token.kind() != sep_token_kind)
     {
         if let Some(first) = entries.next() {
-            docs.push(Doc::flat_or_break(Doc::nil(), Doc::text("| ")));
+            docs.push(Doc::flat_or_break(
+                Doc::nil(),
+                Doc::text(sep_text).append(Doc::space()),
+            ));
             docs.push(first.doc(ctx));
             let mut trivias = format_trivias_after_node(&first, ctx);
             if trivias.is_empty() {
@@ -1485,19 +1494,19 @@ where
         }
     }
 
-    let mut it = entries.zip(pipes).peekable();
-    while let Some((entry, pipe)) = it.next() {
-        docs.push(Doc::text("| "));
+    let mut it = entries.zip(sep_tokens).peekable();
+    while let Some((entry, sep_token)) = it.next() {
+        docs.push(Doc::text(sep_text).append(Doc::space()));
         docs.push(entry.doc(ctx));
         if it.peek().is_some() {
-            let mut trivias_after_pipe =
-                format_trivias_after_token(&SyntaxElement::Token(pipe), ctx);
+            let mut trivias_after_sep_token =
+                format_trivias_after_token(&SyntaxElement::Token(sep_token), ctx);
             let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
-            if trivias_after_pipe.is_empty() && trivias_after_node.is_empty() {
+            if trivias_after_sep_token.is_empty() && trivias_after_node.is_empty() {
                 docs.push(Doc::line_or_space());
             } else {
                 docs.push(Doc::space());
-                docs.append(&mut trivias_after_pipe);
+                docs.append(&mut trivias_after_sep_token);
                 docs.append(&mut trivias_after_node);
             }
         }
