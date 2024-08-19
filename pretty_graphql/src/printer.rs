@@ -78,6 +78,31 @@ impl DocGen for Arguments {
     }
 }
 
+impl DocGen for ArgumentsDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if is_empty_delimiter(self) {
+            Doc::text("()")
+        } else {
+            format_delimiters(
+                format_optional_comma_separated_list(
+                    self,
+                    self.input_value_definitions(),
+                    Doc::line_or_space(),
+                    ctx,
+                ),
+                ("(", ")"),
+                Doc::line_or_nil(),
+                (
+                    self.l_paren_token().map(SyntaxElement::Token),
+                    self.r_paren_token().map(SyntaxElement::Token),
+                ),
+                ctx,
+            )
+            .group()
+        }
+    }
+}
+
 impl DocGen for BooleanValue {
     fn doc(&self, _: &Ctx) -> Doc<'static> {
         Doc::text(self.source_string())
@@ -111,7 +136,7 @@ impl DocGen for Definition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         match self {
             Definition::OperationDefinition(node) => node.doc(ctx),
-            Definition::FragmentDefinition(_) => todo!(),
+            Definition::FragmentDefinition(node) => node.doc(ctx),
             Definition::DirectiveDefinition(_) => todo!(),
             Definition::SchemaDefinition(_) => todo!(),
             Definition::ScalarTypeDefinition(_) => todo!(),
@@ -127,6 +152,16 @@ impl DocGen for Definition {
             Definition::UnionTypeExtension(_) => todo!(),
             Definition::EnumTypeExtension(_) => todo!(),
             Definition::InputObjectTypeExtension(_) => todo!(),
+        }
+    }
+}
+
+impl DocGen for Description {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if let Some(string) = self.string_value() {
+            string.doc(ctx)
+        } else {
+            Doc::nil()
         }
     }
 }
@@ -153,6 +188,12 @@ impl DocGen for Directive {
         }
 
         Doc::list(docs)
+    }
+}
+
+impl DocGen for DirectiveLocation {
+    fn doc(&self, _: &Ctx) -> Doc<'static> {
+        Doc::text(self.source_string())
     }
 }
 
@@ -228,6 +269,52 @@ impl DocGen for FloatValue {
     }
 }
 
+impl DocGen for FragmentDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(fragment) = self.fragment_token() {
+            docs.push(Doc::text("fragment"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(fragment), ctx);
+        }
+        if let Some(fragment_name) = self.fragment_name() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(fragment_name.doc(ctx));
+            trivias = format_trivias_after_node(&fragment_name, ctx);
+        }
+        if let Some(type_condition) = self.type_condition() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(type_condition.doc(ctx));
+            trivias = format_trivias_after_node(&type_condition, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            trivias = format_trivias_after_node(&directives, ctx);
+        }
+        if let Some(selection_set) = self.selection_set() {
+            if trivias.is_empty() && !docs.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(selection_set.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
 impl DocGen for FragmentName {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         if let Some(name) = self.name() {
@@ -296,6 +383,57 @@ impl DocGen for InlineFragment {
                 docs.append(&mut trivias);
             }
             docs.push(selection_set.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for InputValueDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(description) = self.description() {
+            docs.push(description.doc(ctx));
+            trivias = format_trivias_after_node(&description, ctx);
+        }
+        if let Some(name) = self.name() {
+            if trivias.is_empty() && !docs.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(colon) = self.colon_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text(":"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+        }
+        if let Some(ty) = self.ty() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(ty.doc(ctx));
+            trivias = format_trivias_after_node(&ty, ctx);
+        }
+        if let Some(default_value) = self.default_value() {
+            if trivias.is_empty() {
+                docs.push(Doc::space());
+            } else {
+                docs.append(&mut trivias);
+            }
+            docs.push(default_value.doc(ctx));
+            trivias = format_trivias_after_node(&default_value, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if !trivias.is_empty() {
+                docs.append(&mut trivias);
+            }
+            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
         }
 
         Doc::list(docs)
