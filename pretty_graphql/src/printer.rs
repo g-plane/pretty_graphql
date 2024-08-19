@@ -138,14 +138,14 @@ impl DocGen for Definition {
             Definition::InterfaceTypeDefinition(_) => todo!(),
             Definition::UnionTypeDefinition(_) => todo!(),
             Definition::EnumTypeDefinition(node) => node.doc(ctx),
-            Definition::InputObjectTypeDefinition(_) => todo!(),
+            Definition::InputObjectTypeDefinition(node) => node.doc(ctx),
             Definition::SchemaExtension(node) => node.doc(ctx),
             Definition::ScalarTypeExtension(node) => node.doc(ctx),
             Definition::ObjectTypeExtension(_) => todo!(),
             Definition::InterfaceTypeExtension(_) => todo!(),
             Definition::UnionTypeExtension(_) => todo!(),
             Definition::EnumTypeExtension(node) => node.doc(ctx),
-            Definition::InputObjectTypeExtension(_) => todo!(),
+            Definition::InputObjectTypeExtension(node) => node.doc(ctx),
         }
     }
 }
@@ -572,6 +572,115 @@ impl DocGen for InlineFragment {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for InputFieldsDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        if is_empty_delimiter(self) {
+            Doc::text("{}")
+        } else {
+            format_delimiters(
+                format_optional_comma_separated_list(
+                    self,
+                    self.input_value_definitions(),
+                    Doc::hard_line(),
+                    ctx,
+                ),
+                ("{", "}"),
+                Doc::line_or_space(),
+                (
+                    self.l_curly_token().map(SyntaxElement::Token),
+                    self.r_curly_token().map(SyntaxElement::Token),
+                ),
+                ctx,
+            )
+        }
+    }
+}
+
+impl DocGen for InputObjectTypeDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(description) = self.description() {
+            docs.push(description.doc(ctx));
+            trivias = format_trivias_after_node(&description, ctx);
+        }
+        if let Some(input) = self.input_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("input"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(input), ctx);
+        }
+        if let Some(name) = self.name() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+            trivias = format_trivias_after_node(&directives, ctx);
+        }
+        if let Some(input_fields_def) = self.input_fields_definition() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(input_fields_def.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for InputObjectTypeExtension {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(extend) = self.extend_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text("extend"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+        }
+        if let Some(input) = self.input_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("input"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(input), ctx);
+        }
+        if let Some(name) = self.name() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+            trivias = format_trivias_after_node(&directives, ctx);
+        }
+        if let Some(input_fields_def) = self.input_fields_definition() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(input_fields_def.doc(ctx));
         }
 
         Doc::list(docs)
