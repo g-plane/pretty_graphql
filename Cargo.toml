@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["debug_tree", "pretty_graphql"]
+members = ["pretty_graphql", "tree_inspector"]
 
 [profile.release]
 lto = true

@@ -1,5 +1,5 @@
 [package]
-name = "debug_tree"
+name = "tree_inspector"
 version = "0.0.0"
 edition = "2021"
 authors = ["Pig Fang <g-plane@hotmail.com>"]

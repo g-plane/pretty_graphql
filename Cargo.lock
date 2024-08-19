@@ -52,13 +52,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7704b5fdd17b18ae31c4c1da5a2e0305a2bf17b5249300a9ee9ed7b72114c636"
 
 [[package]]
-name = "debug_tree"
-version = "0.0.0"
-dependencies = [
- "apollo-parser",
-]
-
-[[package]]
 name = "encode_unicode"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -342,6 +335,13 @@ dependencies = [
  "serde_spanned",
  "toml_datetime",
  "winnow",
+]
+
+[[package]]
+name = "tree_inspector"
+version = "0.0.0"
+dependencies = [
+ "apollo-parser",
 ]
 
 [[package]]
