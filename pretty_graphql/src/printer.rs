@@ -933,10 +933,18 @@ impl DocGen for SchemaDefinition {
             }
             trivias = format_trivias_after_node(&directives, ctx);
         }
-        if self.l_curly_token().is_some() {
+        if let Some(l_curly) = self.l_curly_token() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
-            docs.push(
+            let is_empty = l_curly
+                .siblings_with_tokens(Direction::Next)
+                .all(|element| {
+                    element.kind() != SyntaxKind::WHITESPACE
+                        && matches!(element, SyntaxElement::Token(..))
+                });
+            docs.push(if is_empty {
+                Doc::text("{}")
+            } else {
                 format_delimiters(
                     format_optional_comma_separated_list(
                         self,
@@ -952,8 +960,8 @@ impl DocGen for SchemaDefinition {
                     ),
                     ctx,
                 )
-                .group(),
-            );
+                .group()
+            });
         }
 
         Doc::list(docs)
@@ -985,10 +993,18 @@ impl DocGen for SchemaExtension {
             }
             trivias = format_trivias_after_node(&directives, ctx);
         }
-        if self.l_curly_token().is_some() {
+        if let Some(l_curly) = self.l_curly_token() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
-            docs.push(
+            let is_empty = l_curly
+                .siblings_with_tokens(Direction::Next)
+                .all(|element| {
+                    element.kind() != SyntaxKind::WHITESPACE
+                        && matches!(element, SyntaxElement::Token(..))
+                });
+            docs.push(if is_empty {
+                Doc::text("{}")
+            } else {
                 format_delimiters(
                     format_optional_comma_separated_list(
                         self,
@@ -1004,8 +1020,8 @@ impl DocGen for SchemaExtension {
                     ),
                     ctx,
                 )
-                .group(),
-            );
+                .group()
+            });
         }
 
         Doc::list(docs)
