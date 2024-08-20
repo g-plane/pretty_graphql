@@ -628,11 +628,7 @@ impl DocGen for FragmentSpread {
             trivias = format_trivias_after_token(&SyntaxElement::Token(dotdotdot), ctx);
         }
         if let Some(fragment_name) = self.fragment_name() {
-            if trivias.is_empty() {
-                docs.push(Doc::space());
-            } else {
-                docs.append(&mut trivias);
-            }
+            docs.append(&mut trivias);
             docs.push(fragment_name.doc(ctx));
             trivias = format_trivias_after_node(&fragment_name, ctx);
         }
