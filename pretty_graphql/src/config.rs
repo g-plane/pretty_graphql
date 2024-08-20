@@ -346,7 +346,7 @@ pub struct LanguageOptions {
 impl Default for LanguageOptions {
     fn default() -> Self {
         LanguageOptions {
-            comma: Comma::Always,
+            comma: Comma::OnlySingleLine,
             arguments_comma: None,
             arguments_definition_comma: None,
             directives_comma: Some(Comma::Never),

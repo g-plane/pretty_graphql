@@ -64,7 +64,7 @@
     "comma": {
       "$ref": "#/definitions/comma",
       "type": "string",
-      "default": "always"
+      "default": "onlySingleLine"
     },
     "arguments.comma": {
       "$ref": "#/definitions/comma",
