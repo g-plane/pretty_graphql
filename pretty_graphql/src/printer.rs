@@ -58,18 +58,16 @@ impl DocGen for Arguments {
             DelimitersFormatter::paren(
                 self.l_paren_token().map(SyntaxElement::Token),
                 self.r_paren_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.arguments_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.arguments(),
-                    Doc::line_or_space(),
-                    ctx.options.arguments_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.arguments_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.arguments(),
+                Doc::line_or_space(),
+                ctx.options.arguments_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -82,18 +80,16 @@ impl DocGen for ArgumentsDefinition {
             DelimitersFormatter::paren(
                 self.l_paren_token().map(SyntaxElement::Token),
                 self.r_paren_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.arguments_definition_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.input_value_definitions(),
-                    Doc::line_or_space(),
-                    ctx.options.arguments_definition_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.arguments_definition_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.input_value_definitions(),
+                Doc::line_or_space(),
+                ctx.options.arguments_definition_comma.as_ref(),
+                ctx,
+            ))
             .group()
         }
     }
@@ -405,18 +401,16 @@ impl DocGen for EnumValuesDefinition {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.enum_values_definition_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.enum_value_definitions(),
-                    Doc::hard_line(),
-                    ctx.options.enum_values_definition_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.enum_values_definition_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.enum_value_definitions(),
+                Doc::hard_line(),
+                ctx.options.enum_values_definition_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -516,18 +510,16 @@ impl DocGen for FieldsDefinition {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.fields_definition_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.field_definitions(),
-                    Doc::hard_line(),
-                    ctx.options.fields_definition_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.fields_definition_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.field_definitions(),
+                Doc::hard_line(),
+                ctx.options.fields_definition_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -689,18 +681,16 @@ impl DocGen for InputFieldsDefinition {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.input_fields_definition_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.input_value_definitions(),
-                    Doc::hard_line(),
-                    ctx.options.input_fields_definition_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.input_fields_definition_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.input_value_definitions(),
+                Doc::hard_line(),
+                ctx.options.input_fields_definition_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -945,12 +935,10 @@ impl DocGen for ListType {
         DelimitersFormatter::bracket(
             self.l_brack_token().map(SyntaxElement::Token),
             self.r_brack_token().map(SyntaxElement::Token),
-        )
-        .with_single_line(Some(&SingleLine::Prefer))
-        .format(
-            self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil),
             ctx,
         )
+        .with_single_line(Some(&SingleLine::Prefer))
+        .format(self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil))
     }
 }
 
@@ -962,18 +950,16 @@ impl DocGen for ListValue {
             DelimitersFormatter::bracket(
                 self.l_brack_token().map(SyntaxElement::Token),
                 self.r_brack_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.list_value_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.values(),
-                    Doc::line_or_space(),
-                    ctx.options.list_value_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.list_value_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.values(),
+                Doc::line_or_space(),
+                ctx.options.list_value_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -1145,18 +1131,16 @@ impl DocGen for ObjectValue {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.object_value_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.object_fields(),
-                    Doc::line_or_space(),
-                    ctx.options.object_value_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.object_value_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.object_fields(),
+                Doc::line_or_space(),
+                ctx.options.object_value_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -1351,18 +1335,16 @@ impl DocGen for SchemaDefinition {
                 DelimitersFormatter::brace(
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
-                )
-                .with_single_line(ctx.options.schema_definition_single_line.as_ref())
-                .format(
-                    format_optional_comma_separated_list(
-                        self,
-                        self.root_operation_type_definitions(),
-                        Doc::hard_line(),
-                        ctx.options.schema_definition_comma.as_ref(),
-                        ctx,
-                    ),
                     ctx,
                 )
+                .with_single_line(ctx.options.schema_definition_single_line.as_ref())
+                .format(format_optional_comma_separated_list(
+                    self,
+                    self.root_operation_type_definitions(),
+                    Doc::hard_line(),
+                    ctx.options.schema_definition_comma.as_ref(),
+                    ctx,
+                ))
             });
         }
 
@@ -1410,18 +1392,16 @@ impl DocGen for SchemaExtension {
                 DelimitersFormatter::brace(
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
-                )
-                .with_single_line(ctx.options.schema_extension_single_line.as_ref())
-                .format(
-                    format_optional_comma_separated_list(
-                        self,
-                        self.root_operation_type_definitions(),
-                        Doc::hard_line(),
-                        ctx.options.schema_extension_comma.as_ref(),
-                        ctx,
-                    ),
                     ctx,
                 )
+                .with_single_line(ctx.options.schema_extension_single_line.as_ref())
+                .format(format_optional_comma_separated_list(
+                    self,
+                    self.root_operation_type_definitions(),
+                    Doc::hard_line(),
+                    ctx.options.schema_extension_comma.as_ref(),
+                    ctx,
+                ))
             });
         }
 
@@ -1444,18 +1424,16 @@ impl DocGen for SelectionSet {
         DelimitersFormatter::brace(
             self.l_curly_token().map(SyntaxElement::Token),
             self.r_curly_token().map(SyntaxElement::Token),
-        )
-        .with_single_line(ctx.options.selection_set_single_line.as_ref())
-        .format(
-            format_optional_comma_separated_list(
-                self,
-                self.selections(),
-                Doc::hard_line(),
-                ctx.options.selection_set_comma.as_ref(),
-                ctx,
-            ),
             ctx,
         )
+        .with_single_line(ctx.options.selection_set_single_line.as_ref())
+        .format(format_optional_comma_separated_list(
+            self,
+            self.selections(),
+            Doc::hard_line(),
+            ctx.options.selection_set_comma.as_ref(),
+            ctx,
+        ))
     }
 }
 
@@ -1679,18 +1657,16 @@ impl DocGen for VariableDefinitions {
             DelimitersFormatter::paren(
                 self.l_paren_token().map(SyntaxElement::Token),
                 self.r_paren_token().map(SyntaxElement::Token),
-            )
-            .with_single_line(ctx.options.variable_definitions_single_line.as_ref())
-            .format(
-                format_optional_comma_separated_list(
-                    self,
-                    self.variable_definitions(),
-                    Doc::line_or_space(),
-                    ctx.options.variable_definitions_comma.as_ref(),
-                    ctx,
-                ),
                 ctx,
             )
+            .with_single_line(ctx.options.variable_definitions_single_line.as_ref())
+            .format(format_optional_comma_separated_list(
+                self,
+                self.variable_definitions(),
+                Doc::line_or_space(),
+                ctx.options.variable_definitions_comma.as_ref(),
+                ctx,
+            ))
         }
     }
 }
@@ -1947,9 +1923,10 @@ struct DelimitersFormatter<'a> {
     open_token: Option<SyntaxElement>,
     close_token: Option<SyntaxElement>,
     single_line: Option<&'a SingleLine>,
+    ctx: &'a Ctx<'a>,
 }
 impl<'a> DelimitersFormatter<'a> {
-    fn paren(open: Option<SyntaxElement>, close: Option<SyntaxElement>) -> Self {
+    fn paren(open: Option<SyntaxElement>, close: Option<SyntaxElement>, ctx: &'a Ctx) -> Self {
         Self {
             open_text: "(",
             close_text: ")",
@@ -1957,9 +1934,10 @@ impl<'a> DelimitersFormatter<'a> {
             open_token: open,
             close_token: close,
             single_line: None,
+            ctx,
         }
     }
-    fn bracket(open: Option<SyntaxElement>, close: Option<SyntaxElement>) -> Self {
+    fn bracket(open: Option<SyntaxElement>, close: Option<SyntaxElement>, ctx: &'a Ctx) -> Self {
         Self {
             open_text: "[",
             close_text: "]",
@@ -1967,9 +1945,10 @@ impl<'a> DelimitersFormatter<'a> {
             open_token: open,
             close_token: close,
             single_line: None,
+            ctx,
         }
     }
-    fn brace(open: Option<SyntaxElement>, close: Option<SyntaxElement>) -> Self {
+    fn brace(open: Option<SyntaxElement>, close: Option<SyntaxElement>, ctx: &'a Ctx) -> Self {
         Self {
             open_text: "{",
             close_text: "}",
@@ -1977,13 +1956,15 @@ impl<'a> DelimitersFormatter<'a> {
             open_token: open,
             close_token: close,
             single_line: None,
+            ctx,
         }
     }
     fn with_single_line(mut self, single_line: Option<&'a SingleLine>) -> Self {
         self.single_line = single_line;
         self
     }
-    fn format(self, body: Doc<'static>, ctx: &Ctx) -> Doc<'static> {
+    fn format(self, body: Doc<'static>) -> Doc<'static> {
+        let ctx = self.ctx;
         let mut docs = Vec::with_capacity(5);
 
         docs.push(Doc::text(self.open_text));
