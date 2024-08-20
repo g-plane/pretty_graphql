@@ -139,6 +139,88 @@ pub struct LanguageOptions {
     )]
     pub variable_definitions_comma: Option<Comma>,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "singleLine"))]
+    pub single_line: SingleLine,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "arguments.single_line", alias = "arguments.singleLine")
+    )]
+    pub arguments_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "arguments_definition.single_line",
+            alias = "argumentsDefinition.singleLine"
+        )
+    )]
+    pub arguments_definition_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "enum_values_definition.single_line",
+            alias = "enumValuesDefinition.singleLine"
+        )
+    )]
+    pub enum_values_definition_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "fields_definition.single_line",
+            alias = "fieldsDefinition.singleLine"
+        )
+    )]
+    pub fields_definition_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "input_fields_definition.single_line",
+            alias = "inputFieldsDefinition.singleLine"
+        )
+    )]
+    pub input_fields_definition_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "list_value.single_line", alias = "listValue.singleLine")
+    )]
+    pub list_value_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "object_value.single_line", alias = "objectValue.singleLine")
+    )]
+    pub object_value_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "schema_definition.single_line",
+            alias = "schemaDefinition.singleLine"
+        )
+    )]
+    pub schema_definition_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "schema_extension.single_line",
+            alias = "schemaExtension.singleLine"
+        )
+    )]
+    pub schema_extension_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "selection_set.single_line",
+            alias = "selectionSet.singleLine"
+        )
+    )]
+    pub selection_set_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "variable_definitions.single_line",
+            alias = "variableDefinitions.singleLine"
+        )
+    )]
+    pub variable_definitions_single_line: Option<SingleLine>,
+
     #[cfg_attr(feature = "config_serde", serde(alias = "formatComments"))]
     pub format_comments: bool,
 
@@ -162,6 +244,18 @@ impl Default for LanguageOptions {
             schema_extension_comma: Some(Comma::Never),
             selection_set_comma: Some(Comma::Never),
             variable_definitions_comma: None,
+            single_line: SingleLine::Smart,
+            arguments_single_line: None,
+            arguments_definition_single_line: None,
+            enum_values_definition_single_line: Some(SingleLine::Never),
+            fields_definition_single_line: Some(SingleLine::Never),
+            input_fields_definition_single_line: Some(SingleLine::Never),
+            list_value_single_line: None,
+            object_value_single_line: Some(SingleLine::Never),
+            schema_definition_single_line: Some(SingleLine::Never),
+            schema_extension_single_line: Some(SingleLine::Never),
+            selection_set_single_line: Some(SingleLine::Never),
+            variable_definitions_single_line: None,
             format_comments: false,
             ignore_comment_directive: "pretty-graphql-ignore".into(),
         }
@@ -176,4 +270,13 @@ pub enum Comma {
     Never,
     NoTrailing,
     OnlySingleLine,
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum SingleLine {
+    Prefer,
+    Smart,
+    Never,
 }

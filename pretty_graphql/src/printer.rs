@@ -1,4 +1,4 @@
-use crate::config::{Comma, LanguageOptions};
+use crate::config::{Comma, LanguageOptions, SingleLine};
 use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode, S};
 use rowan::Direction;
 use tiny_pretty::Doc;
@@ -69,6 +69,7 @@ impl DocGen for Arguments {
                     self.l_paren_token().map(SyntaxElement::Token),
                     self.r_paren_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.arguments_single_line.as_ref(),
                 ctx,
             )
             .group()
@@ -95,6 +96,7 @@ impl DocGen for ArgumentsDefinition {
                     self.l_paren_token().map(SyntaxElement::Token),
                     self.r_paren_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.arguments_definition_single_line.as_ref(),
                 ctx,
             )
             .group()
@@ -419,6 +421,7 @@ impl DocGen for EnumValuesDefinition {
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.enum_values_definition_single_line.as_ref(),
                 ctx,
             )
         }
@@ -531,6 +534,7 @@ impl DocGen for FieldsDefinition {
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.fields_definition_single_line.as_ref(),
                 ctx,
             )
         }
@@ -705,6 +709,7 @@ impl DocGen for InputFieldsDefinition {
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.input_fields_definition_single_line.as_ref(),
                 ctx,
             )
         }
@@ -951,11 +956,12 @@ impl DocGen for ListType {
         format_delimiters(
             self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil),
             ("[", "]"),
-            Doc::line_or_nil(),
+            Doc::nil(),
             (
                 self.l_brack_token().map(SyntaxElement::Token),
                 self.r_brack_token().map(SyntaxElement::Token),
             ),
+            Some(&SingleLine::Prefer),
             ctx,
         )
     }
@@ -980,6 +986,7 @@ impl DocGen for ListValue {
                     self.l_brack_token().map(SyntaxElement::Token),
                     self.r_brack_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.list_value_single_line.as_ref(),
                 ctx,
             )
             .group()
@@ -1165,6 +1172,7 @@ impl DocGen for ObjectValue {
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.object_value_single_line.as_ref(),
                 ctx,
             )
             .group()
@@ -1373,6 +1381,7 @@ impl DocGen for SchemaDefinition {
                         self.l_curly_token().map(SyntaxElement::Token),
                         self.r_curly_token().map(SyntaxElement::Token),
                     ),
+                    ctx.options.schema_definition_single_line.as_ref(),
                     ctx,
                 )
                 .group()
@@ -1434,6 +1443,7 @@ impl DocGen for SchemaExtension {
                         self.l_curly_token().map(SyntaxElement::Token),
                         self.r_curly_token().map(SyntaxElement::Token),
                     ),
+                    ctx.options.schema_extension_single_line.as_ref(),
                     ctx,
                 )
                 .group()
@@ -1470,6 +1480,7 @@ impl DocGen for SelectionSet {
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
             ),
+            ctx.options.selection_set_single_line.as_ref(),
             ctx,
         )
         .group()
@@ -1707,6 +1718,7 @@ impl DocGen for VariableDefinitions {
                     self.l_paren_token().map(SyntaxElement::Token),
                     self.r_paren_token().map(SyntaxElement::Token),
                 ),
+                ctx.options.variable_definitions_single_line.as_ref(),
                 ctx,
             )
             .group()
@@ -1964,6 +1976,7 @@ fn format_delimiters(
     delim_text: (&'static str, &'static str),
     space: Doc<'static>,
     delim_token: (Option<SyntaxElement>, Option<SyntaxElement>),
+    single_line: Option<&SingleLine>,
     ctx: &Ctx,
 ) -> Doc<'static> {
     let mut docs = Vec::with_capacity(5);
@@ -1975,10 +1988,16 @@ fn format_delimiters(
             .next_token()
             .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
         {
-            if token.text().contains(['\n', '\r']) {
-                docs.push(Doc::hard_line());
-            } else {
-                docs.push(space.clone());
+            match single_line.unwrap_or(&ctx.options.single_line) {
+                SingleLine::Prefer => docs.push(space.clone()),
+                SingleLine::Smart => {
+                    if token.text().contains(['\n', '\r']) {
+                        docs.push(Doc::hard_line());
+                    } else {
+                        docs.push(space.clone());
+                    }
+                }
+                SingleLine::Never => docs.push(Doc::hard_line()),
             }
             let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
             docs.append(&mut trivia_docs);
