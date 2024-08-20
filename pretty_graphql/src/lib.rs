@@ -1,22 +1,27 @@
+pub use crate::error::Error;
 use crate::{
     config::FormatOptions,
     printer::{Ctx, DocGen},
 };
-pub use apollo_parser::{cst::Document, Error};
+pub use apollo_parser::cst::Document;
 use tiny_pretty::{print, IndentKind, PrintOptions};
 
 pub mod config;
+mod error;
 mod printer;
 
 /// Format the given source input.
-pub fn format_text(input: &str, options: &FormatOptions) -> Result<String, Vec<Error>> {
+pub fn format_text(input: &str, options: &FormatOptions) -> Result<String, Error> {
     let parser = apollo_parser::Parser::new(input);
     let cst = parser.parse();
     let errors = cst.errors().cloned().collect::<Vec<_>>();
     if errors.is_empty() {
         Ok(print_tree(&cst.document(), options))
     } else {
-        Err(errors)
+        Err(Error {
+            errors,
+            input: input.to_owned(),
+        })
     }
 }
 

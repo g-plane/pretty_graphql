@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     };
 
-    let formatted = format_text(&input, &options).unwrap();
+    let formatted = format_text(&input, &options)?;
     print!("{formatted}");
     Ok(())
 }
