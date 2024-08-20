@@ -136,14 +136,14 @@ impl DocGen for Definition {
             Definition::ScalarTypeDefinition(node) => node.doc(ctx),
             Definition::ObjectTypeDefinition(_) => todo!(),
             Definition::InterfaceTypeDefinition(_) => todo!(),
-            Definition::UnionTypeDefinition(_) => todo!(),
+            Definition::UnionTypeDefinition(node) => node.doc(ctx),
             Definition::EnumTypeDefinition(node) => node.doc(ctx),
             Definition::InputObjectTypeDefinition(node) => node.doc(ctx),
             Definition::SchemaExtension(node) => node.doc(ctx),
             Definition::ScalarTypeExtension(node) => node.doc(ctx),
             Definition::ObjectTypeExtension(_) => todo!(),
             Definition::InterfaceTypeExtension(_) => todo!(),
-            Definition::UnionTypeExtension(_) => todo!(),
+            Definition::UnionTypeExtension(node) => node.doc(ctx),
             Definition::EnumTypeExtension(node) => node.doc(ctx),
             Definition::InputObjectTypeExtension(node) => node.doc(ctx),
         }
@@ -1191,6 +1191,109 @@ impl DocGen for TypeCondition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(named_type.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for UnionMemberTypes {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(3);
+        let mut trivias = vec![];
+        if let Some(eq) = self.eq_token() {
+            docs.push(Doc::text("="));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(eq), ctx);
+        }
+        if self.named_types().count() > 0 {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(format_union_like(self, self.named_types(), S![|], "|", ctx).group());
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for UnionTypeDefinition {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(description) = self.description() {
+            docs.push(description.doc(ctx));
+            trivias = format_trivias_after_node(&description, ctx);
+        }
+        if let Some(union) = self.union_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("union"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(union), ctx);
+        }
+        if let Some(name) = self.name() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+            trivias = format_trivias_after_node(&directives, ctx);
+        }
+        if let Some(union_member_types) = self.union_member_types() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(union_member_types.doc(ctx));
+        }
+
+        Doc::list(docs)
+    }
+}
+
+impl DocGen for UnionTypeExtension {
+    fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
+        let mut trivias = vec![];
+        if let Some(extend) = self.extend_token() {
+            docs.append(&mut trivias);
+            docs.push(Doc::text("extend"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+        }
+        if let Some(union) = self.union_token() {
+            if !docs.is_empty() {
+                docs.push(Doc::space());
+            }
+            docs.append(&mut trivias);
+            docs.push(Doc::text("union"));
+            trivias = format_trivias_after_token(&SyntaxElement::Token(union), ctx);
+        }
+        if let Some(name) = self.name() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(name.doc(ctx));
+            trivias = format_trivias_after_node(&name, ctx);
+        }
+        if let Some(directives) = self.directives() {
+            if trivias.is_empty() {
+                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(directives.doc(ctx).group());
+            }
+            trivias = format_trivias_after_node(&directives, ctx);
+        }
+        if let Some(union_member_types) = self.union_member_types() {
+            docs.push(Doc::space());
+            docs.append(&mut trivias);
+            docs.push(union_member_types.doc(ctx));
         }
 
         Doc::list(docs)
