@@ -1769,8 +1769,6 @@ where
                             0 => {
                                 if prev_kind == SyntaxKind::COMMENT {
                                     docs.push(Doc::hard_line());
-                                } else {
-                                    docs.push(Doc::space());
                                 }
                             }
                             1 => {
