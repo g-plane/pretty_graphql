@@ -55,7 +55,12 @@ impl DocGen for Arguments {
         if is_empty_delimiter(self) {
             Doc::text("()")
         } else {
-            format_delimiters(
+            DelimitersFormatter::paren(
+                self.l_paren_token().map(SyntaxElement::Token),
+                self.r_paren_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.arguments_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.arguments(),
@@ -63,16 +68,8 @@ impl DocGen for Arguments {
                     ctx.options.arguments_comma.as_ref(),
                     ctx,
                 ),
-                ("(", ")"),
-                Doc::line_or_nil(),
-                (
-                    self.l_paren_token().map(SyntaxElement::Token),
-                    self.r_paren_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.arguments_single_line.as_ref(),
                 ctx,
             )
-            .group()
         }
     }
 }
@@ -82,7 +79,12 @@ impl DocGen for ArgumentsDefinition {
         if is_empty_delimiter(self) {
             Doc::text("()")
         } else {
-            format_delimiters(
+            DelimitersFormatter::paren(
+                self.l_paren_token().map(SyntaxElement::Token),
+                self.r_paren_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.arguments_definition_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.input_value_definitions(),
@@ -90,13 +92,6 @@ impl DocGen for ArgumentsDefinition {
                     ctx.options.arguments_definition_comma.as_ref(),
                     ctx,
                 ),
-                ("(", ")"),
-                Doc::line_or_nil(),
-                (
-                    self.l_paren_token().map(SyntaxElement::Token),
-                    self.r_paren_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.arguments_definition_single_line.as_ref(),
                 ctx,
             )
             .group()
@@ -407,7 +402,12 @@ impl DocGen for EnumValuesDefinition {
         if is_empty_delimiter(self) {
             Doc::text("{}")
         } else {
-            format_delimiters(
+            DelimitersFormatter::brace(
+                self.l_curly_token().map(SyntaxElement::Token),
+                self.r_curly_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.enum_values_definition_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.enum_value_definitions(),
@@ -415,13 +415,6 @@ impl DocGen for EnumValuesDefinition {
                     ctx.options.enum_values_definition_comma.as_ref(),
                     ctx,
                 ),
-                ("{", "}"),
-                Doc::line_or_space(),
-                (
-                    self.l_curly_token().map(SyntaxElement::Token),
-                    self.r_curly_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.enum_values_definition_single_line.as_ref(),
                 ctx,
             )
         }
@@ -520,7 +513,12 @@ impl DocGen for FieldsDefinition {
         if is_empty_delimiter(self) {
             Doc::text("{}")
         } else {
-            format_delimiters(
+            DelimitersFormatter::brace(
+                self.l_curly_token().map(SyntaxElement::Token),
+                self.r_curly_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.fields_definition_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.field_definitions(),
@@ -528,13 +526,6 @@ impl DocGen for FieldsDefinition {
                     ctx.options.fields_definition_comma.as_ref(),
                     ctx,
                 ),
-                ("{", "}"),
-                Doc::line_or_space(),
-                (
-                    self.l_curly_token().map(SyntaxElement::Token),
-                    self.r_curly_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.fields_definition_single_line.as_ref(),
                 ctx,
             )
         }
@@ -695,7 +686,12 @@ impl DocGen for InputFieldsDefinition {
         if is_empty_delimiter(self) {
             Doc::text("{}")
         } else {
-            format_delimiters(
+            DelimitersFormatter::brace(
+                self.l_curly_token().map(SyntaxElement::Token),
+                self.r_curly_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.input_fields_definition_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.input_value_definitions(),
@@ -703,13 +699,6 @@ impl DocGen for InputFieldsDefinition {
                     ctx.options.input_fields_definition_comma.as_ref(),
                     ctx,
                 ),
-                ("{", "}"),
-                Doc::line_or_space(),
-                (
-                    self.l_curly_token().map(SyntaxElement::Token),
-                    self.r_curly_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.input_fields_definition_single_line.as_ref(),
                 ctx,
             )
         }
@@ -953,15 +942,13 @@ impl DocGen for IntValue {
 
 impl DocGen for ListType {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_delimiters(
+        DelimitersFormatter::bracket(
+            self.l_brack_token().map(SyntaxElement::Token),
+            self.r_brack_token().map(SyntaxElement::Token),
+        )
+        .with_single_line(Some(&SingleLine::Prefer))
+        .format(
             self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil),
-            ("[", "]"),
-            Doc::nil(),
-            (
-                self.l_brack_token().map(SyntaxElement::Token),
-                self.r_brack_token().map(SyntaxElement::Token),
-            ),
-            Some(&SingleLine::Prefer),
             ctx,
         )
     }
@@ -972,7 +959,12 @@ impl DocGen for ListValue {
         if is_empty_delimiter(self) {
             Doc::text("[]")
         } else {
-            format_delimiters(
+            DelimitersFormatter::bracket(
+                self.l_brack_token().map(SyntaxElement::Token),
+                self.r_brack_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.list_value_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.values(),
@@ -980,16 +972,8 @@ impl DocGen for ListValue {
                     ctx.options.list_value_comma.as_ref(),
                     ctx,
                 ),
-                ("[", "]"),
-                Doc::line_or_nil(),
-                (
-                    self.l_brack_token().map(SyntaxElement::Token),
-                    self.r_brack_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.list_value_single_line.as_ref(),
                 ctx,
             )
-            .group()
         }
     }
 }
@@ -1158,7 +1142,12 @@ impl DocGen for ObjectValue {
         if is_empty_delimiter(self) {
             Doc::text("{}")
         } else {
-            format_delimiters(
+            DelimitersFormatter::brace(
+                self.l_curly_token().map(SyntaxElement::Token),
+                self.r_curly_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.object_value_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.object_fields(),
@@ -1166,16 +1155,8 @@ impl DocGen for ObjectValue {
                     ctx.options.object_value_comma.as_ref(),
                     ctx,
                 ),
-                ("{", "}"),
-                Doc::line_or_space(),
-                (
-                    self.l_curly_token().map(SyntaxElement::Token),
-                    self.r_curly_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.object_value_single_line.as_ref(),
                 ctx,
             )
-            .group()
         }
     }
 }
@@ -1367,7 +1348,12 @@ impl DocGen for SchemaDefinition {
             docs.push(if is_empty {
                 Doc::text("{}")
             } else {
-                format_delimiters(
+                DelimitersFormatter::brace(
+                    self.l_curly_token().map(SyntaxElement::Token),
+                    self.r_curly_token().map(SyntaxElement::Token),
+                )
+                .with_single_line(ctx.options.schema_definition_single_line.as_ref())
+                .format(
                     format_optional_comma_separated_list(
                         self,
                         self.root_operation_type_definitions(),
@@ -1375,16 +1361,8 @@ impl DocGen for SchemaDefinition {
                         ctx.options.schema_definition_comma.as_ref(),
                         ctx,
                     ),
-                    ("{", "}"),
-                    Doc::line_or_space(),
-                    (
-                        self.l_curly_token().map(SyntaxElement::Token),
-                        self.r_curly_token().map(SyntaxElement::Token),
-                    ),
-                    ctx.options.schema_definition_single_line.as_ref(),
                     ctx,
                 )
-                .group()
             });
         }
 
@@ -1429,7 +1407,12 @@ impl DocGen for SchemaExtension {
             docs.push(if is_empty {
                 Doc::text("{}")
             } else {
-                format_delimiters(
+                DelimitersFormatter::brace(
+                    self.l_curly_token().map(SyntaxElement::Token),
+                    self.r_curly_token().map(SyntaxElement::Token),
+                )
+                .with_single_line(ctx.options.schema_extension_single_line.as_ref())
+                .format(
                     format_optional_comma_separated_list(
                         self,
                         self.root_operation_type_definitions(),
@@ -1437,16 +1420,8 @@ impl DocGen for SchemaExtension {
                         ctx.options.schema_extension_comma.as_ref(),
                         ctx,
                     ),
-                    ("{", "}"),
-                    Doc::line_or_space(),
-                    (
-                        self.l_curly_token().map(SyntaxElement::Token),
-                        self.r_curly_token().map(SyntaxElement::Token),
-                    ),
-                    ctx.options.schema_extension_single_line.as_ref(),
                     ctx,
                 )
-                .group()
             });
         }
 
@@ -1466,7 +1441,12 @@ impl DocGen for Selection {
 
 impl DocGen for SelectionSet {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_delimiters(
+        DelimitersFormatter::brace(
+            self.l_curly_token().map(SyntaxElement::Token),
+            self.r_curly_token().map(SyntaxElement::Token),
+        )
+        .with_single_line(ctx.options.selection_set_single_line.as_ref())
+        .format(
             format_optional_comma_separated_list(
                 self,
                 self.selections(),
@@ -1474,16 +1454,8 @@ impl DocGen for SelectionSet {
                 ctx.options.selection_set_comma.as_ref(),
                 ctx,
             ),
-            ("{", "}"),
-            Doc::line_or_space(),
-            (
-                self.l_curly_token().map(SyntaxElement::Token),
-                self.r_curly_token().map(SyntaxElement::Token),
-            ),
-            ctx.options.selection_set_single_line.as_ref(),
             ctx,
         )
-        .group()
     }
 }
 
@@ -1704,7 +1676,12 @@ impl DocGen for VariableDefinitions {
         if is_empty_delimiter(self) {
             Doc::text("()")
         } else {
-            format_delimiters(
+            DelimitersFormatter::paren(
+                self.l_paren_token().map(SyntaxElement::Token),
+                self.r_paren_token().map(SyntaxElement::Token),
+            )
+            .with_single_line(ctx.options.variable_definitions_single_line.as_ref())
+            .format(
                 format_optional_comma_separated_list(
                     self,
                     self.variable_definitions(),
@@ -1712,16 +1689,8 @@ impl DocGen for VariableDefinitions {
                     ctx.options.variable_definitions_comma.as_ref(),
                     ctx,
                 ),
-                ("(", ")"),
-                Doc::line_or_nil(),
-                (
-                    self.l_paren_token().map(SyntaxElement::Token),
-                    self.r_paren_token().map(SyntaxElement::Token),
-                ),
-                ctx.options.variable_definitions_single_line.as_ref(),
                 ctx,
             )
-            .group()
         }
     }
 }
@@ -1971,88 +1940,130 @@ where
     Doc::list(docs)
 }
 
-fn format_delimiters(
-    body: Doc<'static>,
-    delim_text: (&'static str, &'static str),
+struct DelimitersFormatter<'a> {
+    open_text: &'static str,
+    close_text: &'static str,
     space: Doc<'static>,
-    delim_token: (Option<SyntaxElement>, Option<SyntaxElement>),
-    single_line: Option<&SingleLine>,
-    ctx: &Ctx,
-) -> Doc<'static> {
-    let mut docs = Vec::with_capacity(5);
-
-    docs.push(Doc::text(delim_text.0));
-
-    if let Some(open) = delim_token.0.and_then(|open| open.into_token()) {
-        if let Some(token) = open
-            .next_token()
-            .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
-        {
-            match single_line.unwrap_or(&ctx.options.single_line) {
-                SingleLine::Prefer => docs.push(space.clone()),
-                SingleLine::Smart => {
-                    if token.text().contains(['\n', '\r']) {
-                        docs.push(Doc::hard_line());
-                    } else {
-                        docs.push(space.clone());
-                    }
-                }
-                SingleLine::Never => docs.push(Doc::hard_line()),
-            }
-            let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
-            docs.append(&mut trivia_docs);
-        } else {
-            docs.push(space.clone());
-            let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(open), ctx);
-            docs.append(&mut trivia_docs);
+    open_token: Option<SyntaxElement>,
+    close_token: Option<SyntaxElement>,
+    single_line: Option<&'a SingleLine>,
+}
+impl<'a> DelimitersFormatter<'a> {
+    fn paren(open: Option<SyntaxElement>, close: Option<SyntaxElement>) -> Self {
+        Self {
+            open_text: "(",
+            close_text: ")",
+            space: Doc::line_or_nil(),
+            open_token: open,
+            close_token: close,
+            single_line: None,
         }
     }
-
-    docs.push(body);
-
-    let mut has_comment = false;
-    if let Some(close) = delim_token.1.and_then(|close| close.into_token()) {
-        let last_ws_index = close
-            .prev_token()
-            .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
-            .map(|token| token.index());
-        let last_non_trivia = close
-            .siblings_with_tokens(Direction::Prev)
-            .skip(1)
-            .find(|element| {
-                !matches!(element.kind(), SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
-            });
-        let mut trivias = match last_non_trivia {
-            Some(SyntaxElement::Node(node)) => format_trivias(
-                node.siblings_with_tokens(Direction::Next).filter(|token| {
-                    last_ws_index
-                        .map(|index| token.index() != index)
-                        .unwrap_or(true)
-                }),
-                &mut has_comment,
-                false,
-                ctx,
-            ),
-            Some(SyntaxElement::Token(token)) => format_trivias(
-                token.siblings_with_tokens(Direction::Next).filter(|token| {
-                    last_ws_index
-                        .map(|index| token.index() != index)
-                        .unwrap_or(true)
-                }),
-                &mut has_comment,
-                false,
-                ctx,
-            ),
-            None => vec![],
-        };
-        docs.append(&mut trivias);
+    fn bracket(open: Option<SyntaxElement>, close: Option<SyntaxElement>) -> Self {
+        Self {
+            open_text: "[",
+            close_text: "]",
+            space: Doc::line_or_nil(),
+            open_token: open,
+            close_token: close,
+            single_line: None,
+        }
     }
+    fn brace(open: Option<SyntaxElement>, close: Option<SyntaxElement>) -> Self {
+        Self {
+            open_text: "{",
+            close_text: "}",
+            space: Doc::line_or_space(),
+            open_token: open,
+            close_token: close,
+            single_line: None,
+        }
+    }
+    fn with_single_line(mut self, single_line: Option<&'a SingleLine>) -> Self {
+        self.single_line = single_line;
+        self
+    }
+    fn format(self, body: Doc<'static>, ctx: &Ctx) -> Doc<'static> {
+        let mut docs = Vec::with_capacity(5);
 
-    Doc::list(docs)
-        .nest(ctx.indent_width)
-        .append(if has_comment { Doc::hard_line() } else { space })
-        .append(Doc::text(delim_text.1))
-        .group()
+        docs.push(Doc::text(self.open_text));
+
+        if let Some(open) = self.open_token.and_then(|open| open.into_token()) {
+            if let Some(token) = open
+                .next_token()
+                .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
+            {
+                match self.single_line.unwrap_or(&ctx.options.single_line) {
+                    SingleLine::Prefer => docs.push(self.space.clone()),
+                    SingleLine::Smart => {
+                        if token.text().contains(['\n', '\r']) {
+                            docs.push(Doc::hard_line());
+                        } else {
+                            docs.push(self.space.clone());
+                        }
+                    }
+                    SingleLine::Never => docs.push(Doc::hard_line()),
+                }
+                let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
+                docs.append(&mut trivia_docs);
+            } else {
+                docs.push(self.space.clone());
+                let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(open), ctx);
+                docs.append(&mut trivia_docs);
+            }
+        }
+
+        docs.push(body);
+
+        let mut has_comment = false;
+        if let Some(close) = self.close_token.and_then(|close| close.into_token()) {
+            let last_ws_index = close
+                .prev_token()
+                .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
+                .map(|token| token.index());
+            let last_non_trivia =
+                close
+                    .siblings_with_tokens(Direction::Prev)
+                    .skip(1)
+                    .find(|element| {
+                        !matches!(element.kind(), SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
+                    });
+            let mut trivias = match last_non_trivia {
+                Some(SyntaxElement::Node(node)) => format_trivias(
+                    node.siblings_with_tokens(Direction::Next).filter(|token| {
+                        last_ws_index
+                            .map(|index| token.index() != index)
+                            .unwrap_or(true)
+                    }),
+                    &mut has_comment,
+                    false,
+                    ctx,
+                ),
+                Some(SyntaxElement::Token(token)) => format_trivias(
+                    token.siblings_with_tokens(Direction::Next).filter(|token| {
+                        last_ws_index
+                            .map(|index| token.index() != index)
+                            .unwrap_or(true)
+                    }),
+                    &mut has_comment,
+                    false,
+                    ctx,
+                ),
+                None => vec![],
+            };
+            docs.append(&mut trivias);
+        }
+
+        Doc::list(docs)
+            .nest(ctx.indent_width)
+            .append(if has_comment {
+                Doc::hard_line()
+            } else {
+                self.space
+            })
+            .append(Doc::text(self.close_text))
+            .group()
+    }
 }
 
 fn format_comment(text: String, ctx: &Ctx) -> Doc<'static> {
