@@ -1,0 +1,18 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+{
+  field
+  ...XYZ
+  ... on TheType {
+    ...AFragment
+    ... {
+      noTypeCondition
+    }
+  }
+}
+
+fragment XYZ on ABC {
+  field
+  ...AFragment
+}

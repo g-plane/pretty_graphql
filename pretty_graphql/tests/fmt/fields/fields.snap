@@ -1,0 +1,17 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+{
+  posts {
+    title
+    votes
+    author {
+      firstName
+      posts {
+        author {
+          firstName
+        }
+      }
+    }
+  }
+}

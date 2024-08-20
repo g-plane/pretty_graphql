@@ -1,0 +1,9 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+query(
+  $string: String # Some variable comment
+  $bool: Boolean # Some comment
+) {
+  someField
+}

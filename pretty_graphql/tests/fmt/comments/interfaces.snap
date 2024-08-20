@@ -1,0 +1,12 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+type Type1 implements
+& A
+& B
+& C # comment 1
+& D
+& E # comment 2
+{
+  a: a
+}
