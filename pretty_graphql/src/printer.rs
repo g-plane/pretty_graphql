@@ -476,11 +476,16 @@ impl DocGen for Field {
         }
         if let Some(directives) = self.directives() {
             if trivias.is_empty() {
-                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+                docs.push(
+                    Doc::line_or_space()
+                        .append(directives.doc(ctx))
+                        .group()
+                        .nest(ctx.indent_width),
+                );
             } else {
                 docs.push(Doc::space());
                 docs.append(&mut trivias);
-                docs.push(directives.doc(ctx).group());
+                docs.push(directives.doc(ctx).group().nest(ctx.indent_width));
             }
             trivias = format_trivias_after_node(&directives, ctx);
         }
@@ -636,7 +641,12 @@ impl DocGen for FragmentSpread {
             if !trivias.is_empty() {
                 docs.append(&mut trivias);
             }
-            docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+            docs.push(
+                Doc::line_or_space()
+                    .append(directives.doc(ctx))
+                    .group()
+                    .nest(ctx.indent_width),
+            );
         }
 
         Doc::list(docs)
@@ -692,11 +702,16 @@ impl DocGen for InlineFragment {
         }
         if let Some(directives) = self.directives() {
             if trivias.is_empty() {
-                docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
+                docs.push(
+                    Doc::line_or_space()
+                        .append(directives.doc(ctx))
+                        .group()
+                        .nest(ctx.indent_width),
+                );
             } else {
                 docs.push(Doc::space());
                 docs.append(&mut trivias);
-                docs.push(directives.doc(ctx).group());
+                docs.push(directives.doc(ctx).group().nest(ctx.indent_width));
             }
             trivias = format_trivias_after_node(&directives, ctx);
         }
