@@ -665,16 +665,11 @@ impl DocGen for ImplementsInterfaces {
                 ctx,
             );
             if trivias.is_empty() {
-                docs.push(
-                    Doc::line_or_space()
-                        .append(types_doc)
-                        .group()
-                        .nest(ctx.indent_width),
-                );
+                docs.push(Doc::line_or_space().append(types_doc).group());
             } else {
                 docs.push(Doc::space());
                 docs.append(&mut trivias);
-                docs.push(types_doc.group().nest(ctx.indent_width));
+                docs.push(types_doc.group());
             }
         }
 
@@ -1543,16 +1538,11 @@ impl DocGen for UnionMemberTypes {
                 ctx,
             );
             if trivias.is_empty() {
-                docs.push(
-                    Doc::line_or_space()
-                        .append(types_doc)
-                        .group()
-                        .nest(ctx.indent_width),
-                );
+                docs.push(Doc::line_or_space().append(types_doc).group());
             } else {
                 docs.push(Doc::space());
                 docs.append(&mut trivias);
-                docs.push(types_doc.group().nest(ctx.indent_width));
+                docs.push(types_doc.group());
             }
         }
 
@@ -1986,17 +1976,17 @@ where
     while let Some((entry, sep_token)) = it.next() {
         docs.push(Doc::text(sep_text).append(Doc::space()));
         docs.push(entry.doc(ctx));
-        if it.peek().is_some() {
-            let mut trivias_after_sep_token =
-                format_trivias_after_token(&SyntaxElement::Token(sep_token), ctx);
-            let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
-            if trivias_after_sep_token.is_empty() && trivias_after_node.is_empty() {
+        let mut trivias_after_sep_token =
+            format_trivias_after_token(&SyntaxElement::Token(sep_token), ctx);
+        let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
+        if trivias_after_sep_token.is_empty() && trivias_after_node.is_empty() {
+            if it.peek().is_some() {
                 docs.push(space.clone());
-            } else {
-                docs.push(Doc::space());
-                docs.append(&mut trivias_after_sep_token);
-                docs.append(&mut trivias_after_node);
             }
+        } else {
+            docs.push(Doc::space());
+            docs.append(&mut trivias_after_sep_token);
+            docs.append(&mut trivias_after_node);
         }
     }
 
@@ -2106,7 +2096,10 @@ impl<'a> DelimitersFormatter<'a> {
                 let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
                 docs.append(&mut trivia_docs);
             } else {
-                docs.push(self.space.clone());
+                match self.single_line.unwrap_or(&ctx.options.single_line) {
+                    SingleLine::Prefer | SingleLine::Smart => docs.push(self.space.clone()),
+                    SingleLine::Never => docs.push(Doc::hard_line()),
+                }
                 let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(open), ctx);
                 docs.append(&mut trivia_docs);
             }
