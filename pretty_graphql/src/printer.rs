@@ -1827,7 +1827,11 @@ where
                     docs.push(Doc::text(","));
                 }
             }
-            Comma::OnlySingleLine => docs.push(Doc::flat_or_break(Doc::text(","), Doc::nil())),
+            Comma::OnlySingleLine => {
+                if entries.peek().is_some() {
+                    docs.push(Doc::flat_or_break(Doc::text(","), Doc::nil()));
+                }
+            }
         }
 
         let comma = commas.next();
