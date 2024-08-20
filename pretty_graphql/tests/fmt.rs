@@ -7,9 +7,9 @@ fn fmt_snapshot() {
     glob!("fmt/**/*.graphql", |path| {
         let input = fs::read_to_string(path).unwrap();
 
-        let options = fs::read_to_string(path.with_file_name("config.toml"))
+        let options = fs::read_to_string(path.with_file_name("config.json"))
             .map(|config_file| {
-                toml::from_str::<HashMap<String, FormatOptions>>(&config_file).unwrap()
+                serde_json::from_str::<HashMap<String, FormatOptions>>(&config_file).unwrap()
             })
             .ok();
 
