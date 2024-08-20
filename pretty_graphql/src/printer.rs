@@ -1,4 +1,4 @@
-use crate::config::LanguageOptions;
+use crate::config::{Comma, LanguageOptions};
 use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode, S};
 use rowan::Direction;
 use tiny_pretty::Doc;
@@ -60,6 +60,7 @@ impl DocGen for Arguments {
                     self,
                     self.arguments(),
                     Doc::line_or_space(),
+                    ctx.options.arguments_comma.as_ref(),
                     ctx,
                 ),
                 ("(", ")"),
@@ -85,6 +86,7 @@ impl DocGen for ArgumentsDefinition {
                     self,
                     self.input_value_definitions(),
                     Doc::line_or_space(),
+                    ctx.options.arguments_definition_comma.as_ref(),
                     ctx,
                 ),
                 ("(", ")"),
@@ -257,7 +259,13 @@ impl DocGen for DirectiveLocations {
 
 impl DocGen for Directives {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_optional_comma_separated_list(self, self.directives(), Doc::line_or_space(), ctx)
+        format_optional_comma_separated_list(
+            self,
+            self.directives(),
+            Doc::line_or_space(),
+            ctx.options.directives_comma.as_ref(),
+            ctx,
+        )
     }
 }
 
@@ -402,6 +410,7 @@ impl DocGen for EnumValuesDefinition {
                     self,
                     self.enum_value_definitions(),
                     Doc::hard_line(),
+                    ctx.options.enum_values_definition_comma.as_ref(),
                     ctx,
                 ),
                 ("{", "}"),
@@ -513,6 +522,7 @@ impl DocGen for FieldsDefinition {
                     self,
                     self.field_definitions(),
                     Doc::hard_line(),
+                    ctx.options.fields_definition_comma.as_ref(),
                     ctx,
                 ),
                 ("{", "}"),
@@ -686,6 +696,7 @@ impl DocGen for InputFieldsDefinition {
                     self,
                     self.input_value_definitions(),
                     Doc::hard_line(),
+                    ctx.options.input_fields_definition_comma.as_ref(),
                     ctx,
                 ),
                 ("{", "}"),
@@ -960,6 +971,7 @@ impl DocGen for ListValue {
                     self,
                     self.values(),
                     Doc::line_or_space(),
+                    ctx.options.list_value_comma.as_ref(),
                     ctx,
                 ),
                 ("[", "]"),
@@ -1144,6 +1156,7 @@ impl DocGen for ObjectValue {
                     self,
                     self.object_fields(),
                     Doc::line_or_space(),
+                    ctx.options.object_value_comma.as_ref(),
                     ctx,
                 ),
                 ("{", "}"),
@@ -1351,6 +1364,7 @@ impl DocGen for SchemaDefinition {
                         self,
                         self.root_operation_type_definitions(),
                         Doc::hard_line(),
+                        ctx.options.schema_definition_comma.as_ref(),
                         ctx,
                     ),
                     ("{", "}"),
@@ -1411,6 +1425,7 @@ impl DocGen for SchemaExtension {
                         self,
                         self.root_operation_type_definitions(),
                         Doc::hard_line(),
+                        ctx.options.schema_extension_comma.as_ref(),
                         ctx,
                     ),
                     ("{", "}"),
@@ -1442,7 +1457,13 @@ impl DocGen for Selection {
 impl DocGen for SelectionSet {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         format_delimiters(
-            format_optional_comma_separated_list(self, self.selections(), Doc::hard_line(), ctx),
+            format_optional_comma_separated_list(
+                self,
+                self.selections(),
+                Doc::hard_line(),
+                ctx.options.selection_set_comma.as_ref(),
+                ctx,
+            ),
             ("{", "}"),
             Doc::line_or_space(),
             (
@@ -1677,6 +1698,7 @@ impl DocGen for VariableDefinitions {
                     self,
                     self.variable_definitions(),
                     Doc::line_or_space(),
+                    ctx.options.variable_definitions_comma.as_ref(),
                     ctx,
                 ),
                 ("(", ")"),
@@ -1751,6 +1773,7 @@ fn format_optional_comma_separated_list<N, Entry>(
     node: &N,
     entries: CstChildren<Entry>,
     separator: Doc<'static>,
+    comma: Option<&Comma>,
     ctx: &Ctx,
 ) -> Doc<'static>
 where
@@ -1766,9 +1789,25 @@ where
             SyntaxElement::Token(token) if token.kind() == S![,] => Some(token),
             _ => None,
         });
+    let comma = comma.unwrap_or(&ctx.options.comma);
     while let Some(entry) = entries.next() {
         docs.push(entry.doc(ctx));
-        // TODO: comma
+        match comma {
+            Comma::Always => {
+                if entries.peek().is_some() {
+                    docs.push(Doc::text(","));
+                } else {
+                    docs.push(Doc::flat_or_break(Doc::nil(), Doc::text(",")));
+                }
+            }
+            Comma::Never => {}
+            Comma::NoTrailing => {
+                if entries.peek().is_some() {
+                    docs.push(Doc::text(","));
+                }
+            }
+            Comma::OnlySingleLine => docs.push(Doc::flat_or_break(Doc::text(","), Doc::nil())),
+        }
 
         let comma = commas.next();
         let mut has_comment_before_comma = false;

@@ -71,6 +71,74 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
 #[cfg_attr(feature = "config_serde", serde(default))]
 /// Configuration related to syntax.
 pub struct LanguageOptions {
+    pub comma: Comma,
+    #[cfg_attr(feature = "config_serde", serde(alias = "arguments.comma"))]
+    pub arguments_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "arguments_definition.comma",
+            alias = "argumentsDefinition.comma"
+        )
+    )]
+    pub arguments_definition_comma: Option<Comma>,
+    #[cfg_attr(feature = "config_serde", serde(alias = "directives.comma"))]
+    pub directives_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "enum_values_definition.comma",
+            alias = "enumValuesDefinition.comma"
+        )
+    )]
+    pub enum_values_definition_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "fields_definition.comma", alias = "fieldsDefinition.comma")
+    )]
+    pub fields_definition_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "input_fields_definition.comma",
+            alias = "inputFieldsDefinition.comma"
+        )
+    )]
+    pub input_fields_definition_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "list_value.comma", alias = "listValue.comma")
+    )]
+    pub list_value_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "object_value.comma", alias = "objectValue.comma")
+    )]
+    pub object_value_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "schema_definition.comma", alias = "schemaDefinition.comma")
+    )]
+    pub schema_definition_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "schema_extension.comma", alias = "schemaExtension.comma")
+    )]
+    pub schema_extension_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "selection_set.comma", alias = "selectionSet.comma")
+    )]
+    pub selection_set_comma: Option<Comma>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "variable_definitions.comma",
+            alias = "variableDefinitions.comma"
+        )
+    )]
+    pub variable_definitions_comma: Option<Comma>,
+
     #[cfg_attr(feature = "config_serde", serde(alias = "formatComments"))]
     pub format_comments: bool,
 
@@ -81,8 +149,31 @@ pub struct LanguageOptions {
 impl Default for LanguageOptions {
     fn default() -> Self {
         LanguageOptions {
+            comma: Comma::Always,
+            arguments_comma: None,
+            arguments_definition_comma: None,
+            directives_comma: Some(Comma::Never),
+            enum_values_definition_comma: Some(Comma::Never),
+            fields_definition_comma: Some(Comma::Never),
+            input_fields_definition_comma: Some(Comma::Never),
+            list_value_comma: None,
+            object_value_comma: Some(Comma::Never),
+            schema_definition_comma: Some(Comma::Never),
+            schema_extension_comma: Some(Comma::Never),
+            selection_set_comma: Some(Comma::Never),
+            variable_definitions_comma: None,
             format_comments: false,
             ignore_comment_directive: "pretty-graphql-ignore".into(),
         }
     }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "config_serde", serde(rename_all = "kebab-case"))]
+pub enum Comma {
+    Always,
+    Never,
+    NoTrailing,
+    OnlySingleLine,
 }
