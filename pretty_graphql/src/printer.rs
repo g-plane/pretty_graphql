@@ -248,7 +248,15 @@ impl DocGen for DirectiveLocation {
 
 impl DocGen for DirectiveLocations {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        format_union_like(self, self.directive_locations(), S![|], "|", ctx).group()
+        format_union_like(
+            self,
+            self.directive_locations(),
+            S![|],
+            "|",
+            ctx.options.directive_locations_single_line.as_ref(),
+            ctx,
+        )
+        .group()
     }
 }
 
@@ -621,7 +629,14 @@ impl DocGen for ImplementsInterfaces {
             trivias = format_trivias_after_token(&SyntaxElement::Token(implements), ctx);
         }
         if self.named_types().count() > 0 {
-            let types_doc = format_union_like(self, self.named_types(), S![&], "&", ctx);
+            let types_doc = format_union_like(
+                self,
+                self.named_types(),
+                S![&],
+                "&",
+                ctx.options.implements_interfaces_single_line.as_ref(),
+                ctx,
+            );
             if trivias.is_empty() {
                 docs.push(
                     Doc::line_or_space()
@@ -1492,7 +1507,14 @@ impl DocGen for UnionMemberTypes {
             trivias = format_trivias_after_token(&SyntaxElement::Token(eq), ctx);
         }
         if self.named_types().count() > 0 {
-            let types_doc = format_union_like(self, self.named_types(), S![|], "|", ctx);
+            let types_doc = format_union_like(
+                self,
+                self.named_types(),
+                S![|],
+                "|",
+                ctx.options.union_member_types_single_line.as_ref(),
+                ctx,
+            );
             if trivias.is_empty() {
                 docs.push(
                     Doc::line_or_space()
@@ -1870,9 +1892,10 @@ where
 
 fn format_union_like<N, Entry>(
     node: &N,
-    mut entries: CstChildren<Entry>,
+    entries: CstChildren<Entry>,
     sep_token_kind: SyntaxKind,
     sep_text: &'static str,
+    single_line: Option<&SingleLine>,
     ctx: &Ctx,
 ) -> Doc<'static>
 where
@@ -1880,6 +1903,7 @@ where
     Entry: CstNode + DocGen,
 {
     let node = node.syntax();
+    let mut entries = entries.peekable();
     let sep_tokens = node
         .children_with_tokens()
         .filter_map(|element| match element {
@@ -1888,6 +1912,7 @@ where
         });
     let mut docs = Vec::with_capacity(4);
 
+    let mut has_line_break_after_first = false;
     if node
         .first_token()
         .is_some_and(|token| token.kind() != sep_token_kind)
@@ -1898,15 +1923,37 @@ where
                 Doc::text(sep_text).append(Doc::space()),
             ));
             docs.push(first.doc(ctx));
-            let mut trivias = format_trivias_after_node(&first, ctx);
-            if trivias.is_empty() {
-                docs.push(Doc::line_or_space());
-            } else {
-                docs.push(Doc::space());
-                docs.append(&mut trivias);
+            has_line_break_after_first = first
+                .syntax()
+                .siblings_with_tokens(Direction::Next)
+                .skip(1)
+                .map_while(|element| element.into_token())
+                .any(|token| {
+                    token.kind() == SyntaxKind::WHITESPACE && token.text().contains(['\n', '\r'])
+                });
+            if entries.peek().is_some() {
+                let mut trivias = format_trivias_after_node(&first, ctx);
+                if trivias.is_empty() {
+                    docs.push(Doc::line_or_space());
+                } else {
+                    docs.push(Doc::space());
+                    docs.append(&mut trivias);
+                }
             }
         }
     }
+
+    let space = match single_line.unwrap_or(&ctx.options.single_line) {
+        SingleLine::Prefer => Doc::line_or_space(),
+        SingleLine::Smart => {
+            if has_line_break_after_first {
+                Doc::hard_line()
+            } else {
+                Doc::line_or_space()
+            }
+        }
+        SingleLine::Never => Doc::hard_line(),
+    };
 
     let mut it = entries.zip(sep_tokens).peekable();
     while let Some((entry, sep_token)) = it.next() {
@@ -1917,7 +1964,7 @@ where
                 format_trivias_after_token(&SyntaxElement::Token(sep_token), ctx);
             let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
             if trivias_after_sep_token.is_empty() && trivias_after_node.is_empty() {
-                docs.push(Doc::line_or_space());
+                docs.push(space.clone());
             } else {
                 docs.push(Doc::space());
                 docs.append(&mut trivias_after_sep_token);

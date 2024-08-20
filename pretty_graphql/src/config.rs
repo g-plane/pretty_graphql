@@ -165,11 +165,27 @@ pub struct LanguageOptions {
     #[cfg_attr(
         feature = "config_serde",
         serde(
+            rename = "directive_locations.single_line",
+            alias = "directiveLocations.singleLine"
+        )
+    )]
+    pub directive_locations_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
             rename = "fields_definition.single_line",
             alias = "fieldsDefinition.singleLine"
         )
     )]
     pub fields_definition_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "implements_interfaces.single_line",
+            alias = "implementsInterfaces.singleLine"
+        )
+    )]
+    pub implements_interfaces_single_line: Option<SingleLine>,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -212,6 +228,14 @@ pub struct LanguageOptions {
         )
     )]
     pub selection_set_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "union_member_types.single_line",
+            alias = "unionMemberTypes.singleLine"
+        )
+    )]
+    pub union_member_types_single_line: Option<SingleLine>,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -334,13 +358,16 @@ impl Default for LanguageOptions {
             arguments_single_line: None,
             arguments_definition_single_line: None,
             enum_values_definition_single_line: Some(SingleLine::Never),
+            directive_locations_single_line: None,
             fields_definition_single_line: Some(SingleLine::Never),
+            implements_interfaces_single_line: None,
             input_fields_definition_single_line: Some(SingleLine::Never),
             list_value_single_line: None,
             object_value_single_line: Some(SingleLine::Never),
             schema_definition_single_line: Some(SingleLine::Never),
             schema_extension_single_line: Some(SingleLine::Never),
             selection_set_single_line: Some(SingleLine::Never),
+            union_member_types_single_line: None,
             variable_definitions_single_line: None,
             paren_spacing: false,
             arguments_paren_spacing: None,
