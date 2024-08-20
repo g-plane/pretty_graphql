@@ -58,6 +58,7 @@ impl DocGen for Arguments {
             DelimitersFormatter::paren(
                 self.l_paren_token().map(SyntaxElement::Token),
                 self.r_paren_token().map(SyntaxElement::Token),
+                ctx.options.arguments_paren_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.arguments_single_line.as_ref())
@@ -80,6 +81,7 @@ impl DocGen for ArgumentsDefinition {
             DelimitersFormatter::paren(
                 self.l_paren_token().map(SyntaxElement::Token),
                 self.r_paren_token().map(SyntaxElement::Token),
+                ctx.options.arguments_definition_paren_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.arguments_definition_single_line.as_ref())
@@ -401,6 +403,7 @@ impl DocGen for EnumValuesDefinition {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
+                ctx.options.enum_values_definition_brace_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.enum_values_definition_single_line.as_ref())
@@ -510,6 +513,7 @@ impl DocGen for FieldsDefinition {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
+                ctx.options.fields_definition_brace_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.fields_definition_single_line.as_ref())
@@ -681,6 +685,7 @@ impl DocGen for InputFieldsDefinition {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
+                ctx.options.input_fields_definition_brace_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.input_fields_definition_single_line.as_ref())
@@ -935,9 +940,11 @@ impl DocGen for ListType {
         DelimitersFormatter::bracket(
             self.l_brack_token().map(SyntaxElement::Token),
             self.r_brack_token().map(SyntaxElement::Token),
+            Some(true),
             ctx,
         )
         .with_single_line(Some(&SingleLine::Prefer))
+        .with_space(Doc::nil())
         .format(self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil))
     }
 }
@@ -950,6 +957,7 @@ impl DocGen for ListValue {
             DelimitersFormatter::bracket(
                 self.l_brack_token().map(SyntaxElement::Token),
                 self.r_brack_token().map(SyntaxElement::Token),
+                Some(ctx.options.bracket_spacing),
                 ctx,
             )
             .with_single_line(ctx.options.list_value_single_line.as_ref())
@@ -1131,6 +1139,7 @@ impl DocGen for ObjectValue {
             DelimitersFormatter::brace(
                 self.l_curly_token().map(SyntaxElement::Token),
                 self.r_curly_token().map(SyntaxElement::Token),
+                ctx.options.object_value_brace_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.object_value_single_line.as_ref())
@@ -1335,6 +1344,7 @@ impl DocGen for SchemaDefinition {
                 DelimitersFormatter::brace(
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
+                    ctx.options.schema_definition_brace_spacing,
                     ctx,
                 )
                 .with_single_line(ctx.options.schema_definition_single_line.as_ref())
@@ -1392,6 +1402,7 @@ impl DocGen for SchemaExtension {
                 DelimitersFormatter::brace(
                     self.l_curly_token().map(SyntaxElement::Token),
                     self.r_curly_token().map(SyntaxElement::Token),
+                    ctx.options.schema_extension_brace_spacing,
                     ctx,
                 )
                 .with_single_line(ctx.options.schema_extension_single_line.as_ref())
@@ -1424,6 +1435,7 @@ impl DocGen for SelectionSet {
         DelimitersFormatter::brace(
             self.l_curly_token().map(SyntaxElement::Token),
             self.r_curly_token().map(SyntaxElement::Token),
+            ctx.options.selection_set_brace_spacing,
             ctx,
         )
         .with_single_line(ctx.options.selection_set_single_line.as_ref())
@@ -1657,6 +1669,7 @@ impl DocGen for VariableDefinitions {
             DelimitersFormatter::paren(
                 self.l_paren_token().map(SyntaxElement::Token),
                 self.r_paren_token().map(SyntaxElement::Token),
+                ctx.options.variable_definitions_paren_spacing,
                 ctx,
             )
             .with_single_line(ctx.options.variable_definitions_single_line.as_ref())
@@ -1926,38 +1939,69 @@ struct DelimitersFormatter<'a> {
     ctx: &'a Ctx<'a>,
 }
 impl<'a> DelimitersFormatter<'a> {
-    fn paren(open: Option<SyntaxElement>, close: Option<SyntaxElement>, ctx: &'a Ctx) -> Self {
+    fn paren(
+        open: Option<SyntaxElement>,
+        close: Option<SyntaxElement>,
+        spacing: Option<bool>,
+        ctx: &'a Ctx,
+    ) -> Self {
         Self {
             open_text: "(",
             close_text: ")",
-            space: Doc::line_or_nil(),
+            space: if spacing.unwrap_or(ctx.options.paren_spacing) {
+                Doc::line_or_space()
+            } else {
+                Doc::line_or_nil()
+            },
             open_token: open,
             close_token: close,
             single_line: None,
             ctx,
         }
     }
-    fn bracket(open: Option<SyntaxElement>, close: Option<SyntaxElement>, ctx: &'a Ctx) -> Self {
+    fn bracket(
+        open: Option<SyntaxElement>,
+        close: Option<SyntaxElement>,
+        spacing: Option<bool>,
+        ctx: &'a Ctx,
+    ) -> Self {
         Self {
             open_text: "[",
             close_text: "]",
-            space: Doc::line_or_nil(),
+            space: if spacing.unwrap_or(ctx.options.bracket_spacing) {
+                Doc::line_or_space()
+            } else {
+                Doc::line_or_nil()
+            },
             open_token: open,
             close_token: close,
             single_line: None,
             ctx,
         }
     }
-    fn brace(open: Option<SyntaxElement>, close: Option<SyntaxElement>, ctx: &'a Ctx) -> Self {
+    fn brace(
+        open: Option<SyntaxElement>,
+        close: Option<SyntaxElement>,
+        spacing: Option<bool>,
+        ctx: &'a Ctx,
+    ) -> Self {
         Self {
             open_text: "{",
             close_text: "}",
-            space: Doc::line_or_space(),
+            space: if spacing.unwrap_or(ctx.options.brace_spacing) {
+                Doc::line_or_space()
+            } else {
+                Doc::line_or_nil()
+            },
             open_token: open,
             close_token: close,
             single_line: None,
             ctx,
         }
+    }
+    fn with_space(mut self, space: Doc<'static>) -> Self {
+        self.space = space;
+        self
     }
     fn with_single_line(mut self, single_line: Option<&'a SingleLine>) -> Self {
         self.single_line = single_line;

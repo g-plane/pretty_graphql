@@ -221,6 +221,92 @@ pub struct LanguageOptions {
     )]
     pub variable_definitions_single_line: Option<SingleLine>,
 
+    #[cfg_attr(feature = "config_serde", serde(alias = "parenSpacing"))]
+    pub paren_spacing: bool,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(rename = "arguments.paren_spacing", alias = "arguments.parenSpacing")
+    )]
+    pub arguments_paren_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "arguments_definition.paren_spacing",
+            alias = "argumentsDefinition.parenSpacing"
+        )
+    )]
+    pub arguments_definition_paren_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "variable_definitions.paren_spacing",
+            alias = "variableDefinitions.parenSpacing"
+        )
+    )]
+    pub variable_definitions_paren_spacing: Option<bool>,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "bracketSpacing"))]
+    pub bracket_spacing: bool,
+
+    #[cfg_attr(feature = "config_serde", serde(alias = "braceSpacing"))]
+    pub brace_spacing: bool,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "enum_values_definition.brace_spacing",
+            alias = "enumValuesDefinition.braceSpacing"
+        )
+    )]
+    pub enum_values_definition_brace_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "fields_definition.brace_spacing",
+            alias = "fieldsDefinition.braceSpacing"
+        )
+    )]
+    pub fields_definition_brace_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "input_fields_definition.brace_spacing",
+            alias = "inputFieldsDefinition.braceSpacing"
+        )
+    )]
+    pub input_fields_definition_brace_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "object_value.brace_spacing",
+            alias = "objectValue.braceSpacing"
+        )
+    )]
+    pub object_value_brace_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "schema_definition.brace_spacing",
+            alias = "schemaDefinition.braceSpacing"
+        )
+    )]
+    pub schema_definition_brace_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "schema_extension.brace_spacing",
+            alias = "schemaExtension.braceSpacing"
+        )
+    )]
+    pub schema_extension_brace_spacing: Option<bool>,
+    #[cfg_attr(
+        feature = "config_serde",
+        serde(
+            rename = "selection_set.brace_spacing",
+            alias = "selectionSet.braceSpacing"
+        )
+    )]
+    pub selection_set_brace_spacing: Option<bool>,
+
     #[cfg_attr(feature = "config_serde", serde(alias = "formatComments"))]
     pub format_comments: bool,
 
@@ -256,6 +342,19 @@ impl Default for LanguageOptions {
             schema_extension_single_line: Some(SingleLine::Never),
             selection_set_single_line: Some(SingleLine::Never),
             variable_definitions_single_line: None,
+            paren_spacing: false,
+            arguments_paren_spacing: None,
+            arguments_definition_paren_spacing: None,
+            variable_definitions_paren_spacing: None,
+            bracket_spacing: false,
+            brace_spacing: true,
+            enum_values_definition_brace_spacing: None,
+            fields_definition_brace_spacing: None,
+            input_fields_definition_brace_spacing: None,
+            object_value_brace_spacing: None,
+            schema_definition_brace_spacing: None,
+            schema_extension_brace_spacing: None,
+            selection_set_brace_spacing: None,
             format_comments: false,
             ignore_comment_directive: "pretty-graphql-ignore".into(),
         }
