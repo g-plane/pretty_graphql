@@ -172,6 +172,11 @@ pub struct LanguageOptions {
     pub directive_locations_single_line: Option<SingleLine>,
     #[cfg_attr(
         feature = "config_serde",
+        serde(rename = "directives.single_line", alias = "directives.singleLine")
+    )]
+    pub directives_single_line: Option<SingleLine>,
+    #[cfg_attr(
+        feature = "config_serde",
         serde(
             rename = "fields_definition.single_line",
             alias = "fieldsDefinition.singleLine"
@@ -359,6 +364,7 @@ impl Default for LanguageOptions {
             arguments_definition_single_line: None,
             enum_values_definition_single_line: Some(SingleLine::Never),
             directive_locations_single_line: None,
+            directives_single_line: None,
             fields_definition_single_line: Some(SingleLine::Never),
             implements_interfaces_single_line: None,
             input_fields_definition_single_line: Some(SingleLine::Never),

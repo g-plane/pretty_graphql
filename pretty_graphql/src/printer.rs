@@ -262,10 +262,37 @@ impl DocGen for DirectiveLocations {
 
 impl DocGen for Directives {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
+        let separator = match ctx
+            .options
+            .directives_single_line
+            .as_ref()
+            .unwrap_or(&ctx.options.single_line)
+        {
+            SingleLine::Prefer => Doc::line_or_space(),
+            SingleLine::Smart => {
+                if self
+                    .syntax()
+                    .first_child()
+                    .into_iter()
+                    .flat_map(|node| node.siblings_with_tokens(Direction::Next))
+                    .skip(1)
+                    .map_while(|element| element.into_token())
+                    .any(|token| {
+                        token.kind() == SyntaxKind::WHITESPACE
+                            && token.text().contains(['\n', '\r'])
+                    })
+                {
+                    Doc::hard_line()
+                } else {
+                    Doc::line_or_space()
+                }
+            }
+            SingleLine::Never => Doc::hard_line(),
+        };
         format_optional_comma_separated_list(
             self,
             self.directives(),
-            Doc::line_or_space(),
+            separator,
             ctx.options.directives_comma.as_ref(),
             ctx,
         )
