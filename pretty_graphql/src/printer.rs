@@ -1,5 +1,5 @@
 use crate::config::{Comma, LanguageOptions, SingleLine};
-use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode, S};
+use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, S};
 use rowan::Direction;
 use tiny_pretty::Doc;
 
@@ -38,7 +38,7 @@ impl DocGen for Argument {
         if let Some(colon) = self.colon_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+            trivias = format_trivias_after_token(&colon, ctx);
         }
         if let Some(value) = self.value() {
             docs.push(Doc::space());
@@ -56,8 +56,8 @@ impl DocGen for Arguments {
             Doc::text("()")
         } else {
             DelimitersFormatter::paren(
-                self.l_paren_token().map(SyntaxElement::Token),
-                self.r_paren_token().map(SyntaxElement::Token),
+                self.l_paren_token(),
+                self.r_paren_token(),
                 ctx.options.arguments_paren_spacing,
                 ctx,
             )
@@ -79,8 +79,8 @@ impl DocGen for ArgumentsDefinition {
             Doc::text("()")
         } else {
             DelimitersFormatter::paren(
-                self.l_paren_token().map(SyntaxElement::Token),
-                self.r_paren_token().map(SyntaxElement::Token),
+                self.l_paren_token(),
+                self.r_paren_token(),
                 ctx.options.arguments_definition_paren_spacing,
                 ctx,
             )
@@ -108,7 +108,7 @@ impl DocGen for DefaultValue {
         let mut docs = Vec::with_capacity(3);
         docs.push(Doc::text("="));
         let mut trivias = if let Some(eq) = self.eq_token() {
-            format_trivias_after_token(&SyntaxElement::Token(eq), ctx)
+            format_trivias_after_token(&eq, ctx)
         } else {
             vec![]
         };
@@ -162,10 +162,7 @@ impl DocGen for Directive {
         let mut docs = Vec::with_capacity(4);
         docs.push(Doc::text("@"));
         if let Some(at) = self.at_token() {
-            docs.append(&mut format_trivias_after_token(
-                &SyntaxElement::Token(at),
-                ctx,
-            ));
+            docs.append(&mut format_trivias_after_token(&at, ctx));
         }
         if let Some(name) = self.name() {
             docs.push(name.doc(ctx));
@@ -193,7 +190,7 @@ impl DocGen for DirectiveDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("directive"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(directive), ctx);
+            trivias = format_trivias_after_token(&directive, ctx);
         }
         if self.at_token().is_some() {
             docs.push(Doc::space());
@@ -213,13 +210,13 @@ impl DocGen for DirectiveDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(Doc::text("repeatable"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(repeatable), ctx);
+            trivias = format_trivias_after_token(&repeatable, ctx);
         }
         if let Some(on) = self.on_token() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(Doc::text("on"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(on), ctx);
+            trivias = format_trivias_after_token(&on, ctx);
         }
         if let Some(directive_locations) = self.directive_locations() {
             if trivias.is_empty() {
@@ -331,7 +328,7 @@ impl DocGen for EnumTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("enum"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(r#enum), ctx);
+            trivias = format_trivias_after_token(&r#enum, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -366,7 +363,7 @@ impl DocGen for EnumTypeExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(r#enum) = self.enum_token() {
             if !docs.is_empty() {
@@ -374,7 +371,7 @@ impl DocGen for EnumTypeExtension {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("enum"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(r#enum), ctx);
+            trivias = format_trivias_after_token(&r#enum, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -436,8 +433,8 @@ impl DocGen for EnumValuesDefinition {
             Doc::text("{}")
         } else {
             DelimitersFormatter::brace(
-                self.l_curly_token().map(SyntaxElement::Token),
-                self.r_curly_token().map(SyntaxElement::Token),
+                self.l_curly_token(),
+                self.r_curly_token(),
                 ctx.options.enum_values_definition_brace_spacing,
                 ctx,
             )
@@ -523,7 +520,7 @@ impl DocGen for FieldDefinition {
         if let Some(colon) = self.colon_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+            trivias = format_trivias_after_token(&colon, ctx);
         }
         if let Some(ty) = self.ty() {
             docs.push(Doc::space());
@@ -551,8 +548,8 @@ impl DocGen for FieldsDefinition {
             Doc::text("{}")
         } else {
             DelimitersFormatter::brace(
-                self.l_curly_token().map(SyntaxElement::Token),
-                self.r_curly_token().map(SyntaxElement::Token),
+                self.l_curly_token(),
+                self.r_curly_token(),
                 ctx.options.fields_definition_brace_spacing,
                 ctx,
             )
@@ -580,7 +577,7 @@ impl DocGen for FragmentDefinition {
         let mut trivias = vec![];
         if let Some(fragment) = self.fragment_token() {
             docs.push(Doc::text("fragment"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(fragment), ctx);
+            trivias = format_trivias_after_token(&fragment, ctx);
         }
         if let Some(fragment_name) = self.fragment_name() {
             docs.push(Doc::space());
@@ -630,7 +627,7 @@ impl DocGen for FragmentSpread {
         let mut trivias = vec![];
         if let Some(dotdotdot) = self.dotdotdot_token() {
             docs.push(Doc::text("..."));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(dotdotdot), ctx);
+            trivias = format_trivias_after_token(&dotdotdot, ctx);
         }
         if let Some(fragment_name) = self.fragment_name() {
             docs.append(&mut trivias);
@@ -659,7 +656,7 @@ impl DocGen for ImplementsInterfaces {
         let mut trivias = vec![];
         if let Some(implements) = self.implements_token() {
             docs.push(Doc::text("implements"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(implements), ctx);
+            trivias = format_trivias_after_token(&implements, ctx);
         }
         if self.named_types().count() > 0 {
             let types_doc = format_union_like(
@@ -690,7 +687,7 @@ impl DocGen for InlineFragment {
 
         docs.push(Doc::text("..."));
         if let Some(dotdotdot) = self.dotdotdot_token() {
-            trivias = format_trivias_after_token(&SyntaxElement::Token(dotdotdot), ctx);
+            trivias = format_trivias_after_token(&dotdotdot, ctx);
         }
         if let Some(type_condition) = self.type_condition() {
             if trivias.is_empty() {
@@ -731,8 +728,8 @@ impl DocGen for InputFieldsDefinition {
             Doc::text("{}")
         } else {
             DelimitersFormatter::brace(
-                self.l_curly_token().map(SyntaxElement::Token),
-                self.r_curly_token().map(SyntaxElement::Token),
+                self.l_curly_token(),
+                self.r_curly_token(),
                 ctx.options.input_fields_definition_brace_spacing,
                 ctx,
             )
@@ -762,7 +759,7 @@ impl DocGen for InputObjectTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("input"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(input), ctx);
+            trivias = format_trivias_after_token(&input, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -797,7 +794,7 @@ impl DocGen for InputObjectTypeExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(input) = self.input_token() {
             if !docs.is_empty() {
@@ -805,7 +802,7 @@ impl DocGen for InputObjectTypeExtension {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("input"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(input), ctx);
+            trivias = format_trivias_after_token(&input, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -852,7 +849,7 @@ impl DocGen for InputValueDefinition {
         if let Some(colon) = self.colon_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+            trivias = format_trivias_after_token(&colon, ctx);
         }
         if let Some(ty) = self.ty() {
             docs.push(Doc::space());
@@ -894,7 +891,7 @@ impl DocGen for InterfaceTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("interface"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(interface), ctx);
+            trivias = format_trivias_after_token(&interface, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -935,7 +932,7 @@ impl DocGen for InterfaceTypeExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(interface) = self.interface_token() {
             if !docs.is_empty() {
@@ -943,7 +940,7 @@ impl DocGen for InterfaceTypeExtension {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("interface"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(interface), ctx);
+            trivias = format_trivias_after_token(&interface, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -985,15 +982,10 @@ impl DocGen for IntValue {
 
 impl DocGen for ListType {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        DelimitersFormatter::bracket(
-            self.l_brack_token().map(SyntaxElement::Token),
-            self.r_brack_token().map(SyntaxElement::Token),
-            Some(true),
-            ctx,
-        )
-        .with_single_line(Some(&SingleLine::Prefer))
-        .with_space(Doc::nil())
-        .format(self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil))
+        DelimitersFormatter::bracket(self.l_brack_token(), self.r_brack_token(), Some(true), ctx)
+            .with_single_line(Some(&SingleLine::Prefer))
+            .with_space(Doc::nil())
+            .format(self.ty().map(|ty| ty.doc(ctx)).unwrap_or_else(Doc::nil))
     }
 }
 
@@ -1003,8 +995,8 @@ impl DocGen for ListValue {
             Doc::text("[]")
         } else {
             DelimitersFormatter::bracket(
-                self.l_brack_token().map(SyntaxElement::Token),
-                self.r_brack_token().map(SyntaxElement::Token),
+                self.l_brack_token(),
+                self.r_brack_token(),
                 Some(ctx.options.bracket_spacing),
                 ctx,
             )
@@ -1070,7 +1062,7 @@ impl DocGen for ObjectField {
         if let Some(colon) = self.colon_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+            trivias = format_trivias_after_token(&colon, ctx);
         }
         if let Some(value) = self.value() {
             docs.push(Doc::space());
@@ -1097,7 +1089,7 @@ impl DocGen for ObjectTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("type"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(r#type), ctx);
+            trivias = format_trivias_after_token(&r#type, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -1147,7 +1139,7 @@ impl DocGen for ObjectTypeExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(r#type) = self.type_token() {
             if !docs.is_empty() {
@@ -1155,7 +1147,7 @@ impl DocGen for ObjectTypeExtension {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("type"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(r#type), ctx);
+            trivias = format_trivias_after_token(&r#type, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -1203,8 +1195,8 @@ impl DocGen for ObjectValue {
             Doc::text("{}")
         } else {
             DelimitersFormatter::brace(
-                self.l_curly_token().map(SyntaxElement::Token),
-                self.r_curly_token().map(SyntaxElement::Token),
+                self.l_curly_token(),
+                self.r_curly_token(),
                 ctx.options.object_value_brace_spacing,
                 ctx,
             )
@@ -1286,7 +1278,7 @@ impl DocGen for RootOperationTypeDefinition {
         if let Some(colon) = self.colon_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+            trivias = format_trivias_after_token(&colon, ctx);
         }
         if let Some(named_type) = self.named_type() {
             docs.push(Doc::space());
@@ -1312,7 +1304,7 @@ impl DocGen for ScalarTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("scalar"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(scalar), ctx);
+            trivias = format_trivias_after_token(&scalar, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -1341,13 +1333,13 @@ impl DocGen for ScalarTypeExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(scalar) = self.scalar_token() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(Doc::text("scalar"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(scalar), ctx);
+            trivias = format_trivias_after_token(&scalar, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -1383,7 +1375,7 @@ impl DocGen for SchemaDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("schema"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(schema), ctx);
+            trivias = format_trivias_after_token(&schema, ctx);
         }
         if let Some(directives) = self.directives() {
             if trivias.is_empty() {
@@ -1408,8 +1400,8 @@ impl DocGen for SchemaDefinition {
                 Doc::text("{}")
             } else {
                 DelimitersFormatter::brace(
-                    self.l_curly_token().map(SyntaxElement::Token),
-                    self.r_curly_token().map(SyntaxElement::Token),
+                    self.l_curly_token(),
+                    self.r_curly_token(),
                     ctx.options.schema_definition_brace_spacing,
                     ctx,
                 )
@@ -1435,13 +1427,13 @@ impl DocGen for SchemaExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(schema) = self.schema_token() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(Doc::text("schema"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(schema), ctx);
+            trivias = format_trivias_after_token(&schema, ctx);
         }
         if let Some(directives) = self.directives() {
             if trivias.is_empty() {
@@ -1466,8 +1458,8 @@ impl DocGen for SchemaExtension {
                 Doc::text("{}")
             } else {
                 DelimitersFormatter::brace(
-                    self.l_curly_token().map(SyntaxElement::Token),
-                    self.r_curly_token().map(SyntaxElement::Token),
+                    self.l_curly_token(),
+                    self.r_curly_token(),
                     ctx.options.schema_extension_brace_spacing,
                     ctx,
                 )
@@ -1499,8 +1491,8 @@ impl DocGen for Selection {
 impl DocGen for SelectionSet {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         DelimitersFormatter::brace(
-            self.l_curly_token().map(SyntaxElement::Token),
-            self.r_curly_token().map(SyntaxElement::Token),
+            self.l_curly_token(),
+            self.r_curly_token(),
             ctx.options.selection_set_brace_spacing,
             ctx,
         )
@@ -1537,7 +1529,7 @@ impl DocGen for TypeCondition {
         let mut trivias = vec![];
         docs.push(Doc::text("on"));
         if let Some(on) = self.on_token() {
-            trivias = format_trivias_after_token(&SyntaxElement::Token(on), ctx)
+            trivias = format_trivias_after_token(&on, ctx)
         }
         if let Some(named_type) = self.named_type() {
             docs.push(Doc::space());
@@ -1555,7 +1547,7 @@ impl DocGen for UnionMemberTypes {
         let mut trivias = vec![];
         if let Some(eq) = self.eq_token() {
             docs.push(Doc::text("="));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(eq), ctx);
+            trivias = format_trivias_after_token(&eq, ctx);
         }
         if self.named_types().count() > 0 {
             let types_doc = format_union_like(
@@ -1593,7 +1585,7 @@ impl DocGen for UnionTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("union"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(union), ctx);
+            trivias = format_trivias_after_token(&union, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -1628,7 +1620,7 @@ impl DocGen for UnionTypeExtension {
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(extend), ctx);
+            trivias = format_trivias_after_token(&extend, ctx);
         }
         if let Some(union) = self.union_token() {
             if !docs.is_empty() {
@@ -1636,7 +1628,7 @@ impl DocGen for UnionTypeExtension {
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("union"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(union), ctx);
+            trivias = format_trivias_after_token(&union, ctx);
         }
         if let Some(name) = self.name() {
             docs.push(Doc::space());
@@ -1701,7 +1693,7 @@ impl DocGen for VariableDefinition {
         if let Some(colon) = self.colon_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text(":"));
-            trivias = format_trivias_after_token(&SyntaxElement::Token(colon), ctx);
+            trivias = format_trivias_after_token(&colon, ctx);
         }
         if let Some(ty) = self.ty() {
             docs.push(Doc::space());
@@ -1735,8 +1727,8 @@ impl DocGen for VariableDefinitions {
             Doc::text("()")
         } else {
             DelimitersFormatter::paren(
-                self.l_paren_token().map(SyntaxElement::Token),
-                self.r_paren_token().map(SyntaxElement::Token),
+                self.l_paren_token(),
+                self.r_paren_token(),
                 ctx.options.variable_definitions_paren_spacing,
                 ctx,
             )
@@ -2007,8 +1999,7 @@ where
     while let Some((entry, sep_token)) = it.next() {
         docs.push(Doc::text(sep_text).append(Doc::space()));
         docs.push(entry.doc(ctx));
-        let mut trivias_after_sep_token =
-            format_trivias_after_token(&SyntaxElement::Token(sep_token), ctx);
+        let mut trivias_after_sep_token = format_trivias_after_token(&sep_token, ctx);
         let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
         if trivias_after_sep_token.is_empty() && trivias_after_node.is_empty() {
             if it.peek().is_some() {
@@ -2028,15 +2019,15 @@ struct DelimitersFormatter<'a> {
     open_text: &'static str,
     close_text: &'static str,
     space: Doc<'static>,
-    open_token: Option<SyntaxElement>,
-    close_token: Option<SyntaxElement>,
+    open_token: Option<SyntaxToken>,
+    close_token: Option<SyntaxToken>,
     single_line: Option<&'a SingleLine>,
     ctx: &'a Ctx<'a>,
 }
 impl<'a> DelimitersFormatter<'a> {
     fn paren(
-        open: Option<SyntaxElement>,
-        close: Option<SyntaxElement>,
+        open: Option<SyntaxToken>,
+        close: Option<SyntaxToken>,
         spacing: Option<bool>,
         ctx: &'a Ctx,
     ) -> Self {
@@ -2055,8 +2046,8 @@ impl<'a> DelimitersFormatter<'a> {
         }
     }
     fn bracket(
-        open: Option<SyntaxElement>,
-        close: Option<SyntaxElement>,
+        open: Option<SyntaxToken>,
+        close: Option<SyntaxToken>,
         spacing: Option<bool>,
         ctx: &'a Ctx,
     ) -> Self {
@@ -2075,8 +2066,8 @@ impl<'a> DelimitersFormatter<'a> {
         }
     }
     fn brace(
-        open: Option<SyntaxElement>,
-        close: Option<SyntaxElement>,
+        open: Option<SyntaxToken>,
+        close: Option<SyntaxToken>,
         spacing: Option<bool>,
         ctx: &'a Ctx,
     ) -> Self {
@@ -2108,7 +2099,7 @@ impl<'a> DelimitersFormatter<'a> {
 
         docs.push(Doc::text(self.open_text));
 
-        if let Some(open) = self.open_token.and_then(|open| open.into_token()) {
+        if let Some(open) = self.open_token {
             if let Some(token) = open
                 .next_token()
                 .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
@@ -2124,14 +2115,14 @@ impl<'a> DelimitersFormatter<'a> {
                     }
                     SingleLine::Never => docs.push(Doc::hard_line()),
                 }
-                let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(token), ctx);
+                let mut trivia_docs = format_trivias_after_token(&token, ctx);
                 docs.append(&mut trivia_docs);
             } else {
                 match self.single_line.unwrap_or(&ctx.options.single_line) {
                     SingleLine::Prefer | SingleLine::Smart => docs.push(self.space.clone()),
                     SingleLine::Never => docs.push(Doc::hard_line()),
                 }
-                let mut trivia_docs = format_trivias_after_token(&SyntaxElement::Token(open), ctx);
+                let mut trivia_docs = format_trivias_after_token(&open, ctx);
                 docs.append(&mut trivia_docs);
             }
         }
@@ -2139,7 +2130,7 @@ impl<'a> DelimitersFormatter<'a> {
         docs.push(body);
 
         let mut has_comment = false;
-        if let Some(close) = self.close_token.and_then(|close| close.into_token()) {
+        if let Some(close) = self.close_token {
             let last_ws_index = close
                 .prev_token()
                 .filter(|token| token.kind() == SyntaxKind::WHITESPACE)
@@ -2212,8 +2203,7 @@ fn format_trivias_after_node<N: CstNode>(node: &N, ctx: &Ctx) -> Vec<Doc<'static
     )
 }
 
-fn format_trivias_after_token(element: &SyntaxElement, ctx: &Ctx) -> Vec<Doc<'static>> {
-    let token = element.as_token().expect("expect rowan token");
+fn format_trivias_after_token(token: &SyntaxToken, ctx: &Ctx) -> Vec<Doc<'static>> {
     let mut _has_comment = false;
     format_trivias(
         token.siblings_with_tokens(Direction::Next),
