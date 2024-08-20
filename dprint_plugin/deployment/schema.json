@@ -1,0 +1,245 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://plugins.dprint.dev/g-plane/pretty_graphql/v0.0.0/schema.json",
+  "title": "Config",
+  "description": "Configuration for dprint-plugin-graphql.",
+  "type": "object",
+  "definitions": {
+    "comma": {
+      "type": ["string", "null"],
+      "oneOf": [
+        {
+          "const": "always"
+        },
+        {
+          "const": "never"
+        },
+        {
+          "const": "noTrailing"
+        },
+        {
+          "const": "onlySingleLine"
+        }
+      ]
+    },
+    "singleLine": {
+      "type": ["string", "null"],
+      "oneOf": [
+        {
+          "const": "prefer"
+        },
+        {
+          "const": "smart"
+        },
+        {
+          "const": "never"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "printWidth": {
+      "description": "The line width limitation that Pretty GraphQL should *(but not must)* avoid exceeding. Pretty GraphQL will try its best to keep line width less than this value, but it may exceed for some cases, for example, a very very long single word.",
+      "type": "integer",
+      "default": 80,
+      "minimum": 0
+    },
+    "useTabs": {
+      "description": "Specify use space or tab for indentation.",
+      "type": "boolean",
+      "default": false
+    },
+    "indentWidth": {
+      "description": "Size of indentation. When enabled `useTabs`, this option may be disregarded, since only one tab will be inserted when indented once.",
+      "type": "integer",
+      "default": 2,
+      "minimum": 0
+    },
+    "lineBreak": {
+      "description": "Specify whether use `\\n` (LF) or `\\r\\n` (CRLF) for line break.",
+      "type": "string",
+      "enum": ["lf", "crlf"],
+      "default": "lf"
+    },
+    "comma": {
+      "$ref": "#/definitions/comma",
+      "type": "string",
+      "default": "always"
+    },
+    "arguments.comma": {
+      "$ref": "#/definitions/comma",
+      "default": null
+    },
+    "argumentsDefinition.comma": {
+      "$ref": "#/definitions/comma",
+      "default": null
+    },
+    "directives.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "enumValuesDefinition.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "fieldsDefinition.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "inputFieldsDefinition.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "listValue.comma": {
+      "$ref": "#/definitions/comma",
+      "default": null
+    },
+    "objectValue.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "schemaDefinition.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "schemaExtension.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "selectionSet.comma": {
+      "$ref": "#/definitions/comma",
+      "default": "never"
+    },
+    "variableDefinitions.comma": {
+      "$ref": "#/definitions/comma",
+      "default": null
+    },
+    "singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "type": "string",
+      "default": "smart"
+    },
+    "arguments.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "argumentsDefinition.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "directiveLocations.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "directives.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "enumValuesDefinition.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "fieldsDefinition.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "implementsInterfaces.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "inputFieldsDefinition.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "listValue.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "objectValue.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "schemaDefinition.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "schemaExtension.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "selectionSet.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": "never"
+    },
+    "unionMemberTypes.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "variableDefinitions.singleLine": {
+      "$ref": "#/definitions/singleLine",
+      "default": null
+    },
+    "parenSpacing": {
+      "type": "boolean",
+      "default": false
+    },
+    "arguments.parenSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "argumentsDefinition.parenSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "variableDefinitions.parenSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "bracketSpacing": {
+      "type": "boolean",
+      "default": false
+    },
+    "braceSpacing": {
+      "type": "boolean",
+      "default": true
+    },
+    "enumValuesDefinition.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "fieldsDefinition.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "inputFieldsDefinition.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "objectValue.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "schemaDefinition.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "schemaExtension.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "selectionSet.braceSpacing": {
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "formatComments": {
+      "description": "Control whether whitespace should be inserted at the beginning of comments or not.",
+      "type": "boolean",
+      "default": false
+    },
+    "ignoreCommentDirective": {
+      "description": "Text directive for ignoring formatting specific content.",
+      "type": "string",
+      "default": "pretty-graphql-ignore"
+    }
+  }
+}
