@@ -1206,9 +1206,19 @@ impl DocGen for UnionMemberTypes {
             trivias = format_trivias_after_token(&SyntaxElement::Token(eq), ctx);
         }
         if self.named_types().count() > 0 {
-            docs.push(Doc::space());
-            docs.append(&mut trivias);
-            docs.push(format_union_like(self, self.named_types(), S![|], "|", ctx).group());
+            let types_doc = format_union_like(self, self.named_types(), S![|], "|", ctx);
+            if trivias.is_empty() {
+                docs.push(
+                    Doc::line_or_space()
+                        .append(types_doc)
+                        .group()
+                        .nest(ctx.indent_width),
+                );
+            } else {
+                docs.push(Doc::space());
+                docs.append(&mut trivias);
+                docs.push(types_doc.group().nest(ctx.indent_width));
+            }
         }
 
         Doc::list(docs)
