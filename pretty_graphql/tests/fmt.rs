@@ -1,5 +1,6 @@
 use insta::{assert_snapshot, glob, Settings};
 use pretty_graphql::{config::FormatOptions, format_text};
+use serde::Deserialize;
 use std::{collections::HashMap, fs, path::Path};
 
 #[test]
@@ -9,7 +10,17 @@ fn fmt_snapshot() {
 
         let options = fs::read_to_string(path.with_file_name("config.json"))
             .map(|config_file| {
-                serde_json::from_str::<HashMap<String, FormatOptions>>(&config_file).unwrap()
+                #[derive(Deserialize)]
+                struct Config {
+                    #[serde(rename = "$schema")]
+                    _schema: Option<String>,
+                    #[serde(flatten)]
+                    configs: HashMap<String, FormatOptions>,
+                }
+
+                serde_json::from_str::<Config>(&config_file)
+                    .unwrap()
+                    .configs
             })
             .ok();
 
