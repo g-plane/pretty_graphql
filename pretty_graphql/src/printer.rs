@@ -1078,7 +1078,7 @@ impl DocGen for ObjectTypeDefinition {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(5);
         let mut trivias = vec![];
-        let mut has_comments_in_implements = false;
+        let mut has_last_comments_in_implements = false;
         if let Some(description) = self.description() {
             docs.push(description.doc(ctx));
             trivias = format_trivias_after_node(&description, ctx);
@@ -1101,17 +1101,15 @@ impl DocGen for ObjectTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(interfaces.doc(ctx));
-            has_comments_in_implements = interfaces
-                .syntax()
-                .children_with_tokens()
-                .any(|element| element.kind() == SyntaxKind::COMMENT);
+            has_last_comments_in_implements =
+                check_last_comments_in_implements_interfaces(&interfaces);
             trivias = format_trivias_after_node(&interfaces, ctx);
         }
         if let Some(directives) = self.directives() {
             if trivias.is_empty() {
                 docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
             } else {
-                if !has_comments_in_implements || !trivias.is_empty() {
+                if !has_last_comments_in_implements || !trivias.is_empty() {
                     docs.push(Doc::space());
                 }
                 docs.append(&mut trivias);
@@ -1120,7 +1118,7 @@ impl DocGen for ObjectTypeDefinition {
             trivias = format_trivias_after_node(&directives, ctx);
         }
         if let Some(fields_def) = self.fields_definition() {
-            if !has_comments_in_implements || !trivias.is_empty() {
+            if !has_last_comments_in_implements || !trivias.is_empty() {
                 docs.push(Doc::space());
             }
             docs.append(&mut trivias);
@@ -1135,7 +1133,7 @@ impl DocGen for ObjectTypeExtension {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
         let mut docs = Vec::with_capacity(5);
         let mut trivias = vec![];
-        let mut has_comments_in_implements = false;
+        let mut has_last_comments_in_implements = false;
         if let Some(extend) = self.extend_token() {
             docs.append(&mut trivias);
             docs.push(Doc::text("extend"));
@@ -1159,17 +1157,15 @@ impl DocGen for ObjectTypeExtension {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(interfaces.doc(ctx));
-            has_comments_in_implements = interfaces
-                .syntax()
-                .children_with_tokens()
-                .any(|element| element.kind() == SyntaxKind::COMMENT);
+            has_last_comments_in_implements =
+                check_last_comments_in_implements_interfaces(&interfaces);
             trivias = format_trivias_after_node(&interfaces, ctx);
         }
         if let Some(directives) = self.directives() {
             if trivias.is_empty() {
                 docs.push(Doc::line_or_space().append(directives.doc(ctx)).group());
             } else {
-                if !has_comments_in_implements || !trivias.is_empty() {
+                if !has_last_comments_in_implements || !trivias.is_empty() {
                     docs.push(Doc::space());
                 }
                 docs.append(&mut trivias);
@@ -1178,7 +1174,7 @@ impl DocGen for ObjectTypeExtension {
             trivias = format_trivias_after_node(&directives, ctx);
         }
         if let Some(fields_def) = self.fields_definition() {
-            if !has_comments_in_implements || !trivias.is_empty() {
+            if !has_last_comments_in_implements || !trivias.is_empty() {
                 docs.push(Doc::space());
             }
             docs.append(&mut trivias);
@@ -2316,4 +2312,16 @@ fn is_empty_delimiter<N: CstNode>(node: &N) -> bool {
     node.syntax()
         .children_with_tokens()
         .all(|element| element.kind() != SyntaxKind::COMMENT && element.as_node().is_none())
+}
+
+fn check_last_comments_in_implements_interfaces(node: &ImplementsInterfaces) -> bool {
+    node.syntax()
+        .last_child()
+        .into_iter()
+        .flat_map(|node| node.siblings_with_tokens(Direction::Prev))
+        .skip(1)
+        .take_while(|element| {
+            matches!(element.kind(), SyntaxKind::WHITESPACE | SyntaxKind::COMMENT)
+        })
+        .any(|element| element.kind() == SyntaxKind::COMMENT)
 }
