@@ -369,7 +369,7 @@ impl Default for LanguageOptions {
             implements_interfaces_single_line: None,
             input_fields_definition_single_line: Some(SingleLine::Never),
             list_value_single_line: None,
-            object_value_single_line: Some(SingleLine::Never),
+            object_value_single_line: None,
             schema_definition_single_line: Some(SingleLine::Never),
             schema_extension_single_line: Some(SingleLine::Never),
             selection_set_single_line: Some(SingleLine::Never),

@@ -157,7 +157,7 @@
     },
     "objectValue.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": "never"
+      "default": null
     },
     "schemaDefinition.singleLine": {
       "$ref": "#/definitions/singleLine",
