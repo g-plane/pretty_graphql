@@ -1979,6 +1979,16 @@ where
                 }
             }
         }
+    } else {
+        has_line_break_after_first = entries
+            .peek()
+            .into_iter()
+            .flat_map(|entry| entry.syntax().siblings_with_tokens(Direction::Next))
+            .skip(1)
+            .map_while(|element| element.into_token())
+            .any(|token| {
+                token.kind() == SyntaxKind::WHITESPACE && token.text().contains(['\n', '\r'])
+            });
     }
 
     let space = match single_line.unwrap_or(&ctx.options.single_line) {
