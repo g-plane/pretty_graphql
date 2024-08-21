@@ -186,7 +186,14 @@ impl DocGen for DirectiveDefinition {
         }
         if let Some(directive) = self.directive_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("directive"));
@@ -324,7 +331,14 @@ impl DocGen for EnumTypeDefinition {
         }
         if let Some(r#enum) = self.enum_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("enum"));
@@ -408,7 +422,14 @@ impl DocGen for EnumValueDefinition {
             trivias = format_trivias_after_node(&description, ctx);
         }
         if let Some(enum_value) = self.enum_value() {
-            docs.push(Doc::space());
+            if self
+                .description()
+                .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+            {
+                docs.push(Doc::hard_line());
+            } else {
+                docs.push(Doc::space());
+            }
             docs.append(&mut trivias);
             docs.push(enum_value.doc(ctx));
             trivias = format_trivias_after_node(&enum_value, ctx);
@@ -506,7 +527,14 @@ impl DocGen for FieldDefinition {
         }
         if let Some(name) = self.name() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(name.doc(ctx));
@@ -755,7 +783,14 @@ impl DocGen for InputObjectTypeDefinition {
         }
         if let Some(input) = self.input_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("input"));
@@ -840,7 +875,14 @@ impl DocGen for InputValueDefinition {
         }
         if let Some(name) = self.name() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(name.doc(ctx));
@@ -887,7 +929,14 @@ impl DocGen for InterfaceTypeDefinition {
         }
         if let Some(interface) = self.interface_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("interface"));
@@ -1085,7 +1134,14 @@ impl DocGen for ObjectTypeDefinition {
         }
         if let Some(r#type) = self.type_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("type"));
@@ -1296,7 +1352,14 @@ impl DocGen for ScalarTypeDefinition {
         }
         if let Some(scalar) = self.scalar_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("scalar"));
@@ -1367,7 +1430,14 @@ impl DocGen for SchemaDefinition {
         }
         if let Some(schema) = self.schema_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("schema"));
@@ -1587,7 +1657,14 @@ impl DocGen for UnionTypeDefinition {
         }
         if let Some(union) = self.union_token() {
             if !docs.is_empty() {
-                docs.push(Doc::space());
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(Doc::text("union"));
