@@ -1692,7 +1692,7 @@ impl DocGen for UnionTypeDefinition {
         if let Some(union_member_types) = self.union_member_types() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
-            docs.push(union_member_types.doc(ctx));
+            docs.push(union_member_types.doc(ctx).nest(ctx.indent_width));
         }
 
         Doc::list(docs)
@@ -1735,7 +1735,7 @@ impl DocGen for UnionTypeExtension {
         if let Some(union_member_types) = self.union_member_types() {
             docs.push(Doc::space());
             docs.append(&mut trivias);
-            docs.push(union_member_types.doc(ctx));
+            docs.push(union_member_types.doc(ctx).nest(ctx.indent_width));
         }
 
         Doc::list(docs)
