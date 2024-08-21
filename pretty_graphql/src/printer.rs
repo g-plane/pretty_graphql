@@ -1948,11 +1948,13 @@ where
         });
     let mut docs = Vec::with_capacity(4);
 
+    let mut has_leading_sep_token = true;
     let mut has_line_break_after_first = false;
     if node
         .first_token()
         .is_some_and(|token| token.kind() != sep_token_kind)
     {
+        has_leading_sep_token = false;
         if let Some(first) = entries.next() {
             docs.push(Doc::flat_or_break(
                 Doc::nil(),
@@ -1991,9 +1993,16 @@ where
         SingleLine::Never => Doc::hard_line(),
     };
 
-    let mut it = entries.zip(sep_tokens).peekable();
-    while let Some((entry, sep_token)) = it.next() {
-        docs.push(Doc::text(sep_text).append(Doc::space()));
+    let mut it = entries.zip(sep_tokens).enumerate().peekable();
+    while let Some((i, (entry, sep_token))) = it.next() {
+        if i == 0 && has_leading_sep_token {
+            docs.push(Doc::flat_or_break(
+                Doc::nil(),
+                Doc::text(sep_text).append(Doc::space()),
+            ));
+        } else {
+            docs.push(Doc::text(sep_text).append(Doc::space()));
+        }
         docs.push(entry.doc(ctx));
         let mut trivias_after_sep_token = format_trivias_after_token(&sep_token, ctx);
         let mut trivias_after_node = format_trivias_after_node(&entry, ctx);
