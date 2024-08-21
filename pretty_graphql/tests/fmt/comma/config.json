@@ -1,0 +1,42 @@
+{
+  "$schema": "../../test-schema.json",
+  "always": {
+    "comma": "always"
+  },
+  "never": {
+    "comma": "never"
+  },
+  "noTrailing": {
+    "comma": "noTrailing"
+  },
+  "onlySingleLine": {
+    "comma": "onlySingleLine"
+  },
+  "override-always": {
+    "variableDefinitions.comma": "always"
+  },
+  "override-never": {
+    "variableDefinitions.comma": "never"
+  },
+  "override-no-trailing": {
+    "variableDefinitions.comma": "noTrailing"
+  },
+  "override-only-single-line": {
+    "comma": "never",
+    "variableDefinitions.comma": "onlySingleLine"
+  },
+  "customized-always": {
+    "selectionSet.comma": "always"
+  },
+  "customized-never": {
+    "selectionSet.comma": "never"
+  },
+  "customized-no-trailing": {
+    "selectionSet.comma": "noTrailing"
+  },
+  "customized-only-single-line": {
+    "comma": "never",
+    "selectionSet.comma": "onlySingleLine",
+    "selectionSet.singleLine": "smart"
+  }
+}
