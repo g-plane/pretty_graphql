@@ -422,13 +422,15 @@ impl DocGen for EnumValueDefinition {
             trivias = format_trivias_after_node(&description, ctx);
         }
         if let Some(enum_value) = self.enum_value() {
-            if self
-                .description()
-                .is_some_and(|description| description.source_string().ends_with("\"\"\""))
-            {
-                docs.push(Doc::hard_line());
-            } else {
-                docs.push(Doc::space());
+            if !docs.is_empty() {
+                if self
+                    .description()
+                    .is_some_and(|description| description.source_string().ends_with("\"\"\""))
+                {
+                    docs.push(Doc::hard_line());
+                } else {
+                    docs.push(Doc::space());
+                }
             }
             docs.append(&mut trivias);
             docs.push(enum_value.doc(ctx));
