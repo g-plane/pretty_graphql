@@ -278,7 +278,48 @@ impl DocGen for Directives {
 
 impl DocGen for Document {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        let mut docs = format_line_break_separated_list::<_, Definition, true>(self, ctx);
+        let mut docs = Vec::with_capacity(2);
+
+        let mut children = self.syntax().children_with_tokens().peekable();
+        let mut prev_kind = SyntaxKind::WHITESPACE;
+        while let Some(element) = children.next() {
+            let kind = element.kind();
+            match element {
+                SyntaxElement::Node(node) => {
+                    if should_ignore(&node, ctx) {
+                        reflow(&node.to_string(), &mut docs);
+                    } else if let Some(item) = Definition::cast(node) {
+                        docs.push(item.doc(ctx));
+                    }
+                }
+                SyntaxElement::Token(token) => match token.kind() {
+                    SyntaxKind::COMMENT => {
+                        docs.push(format_comment(token.to_string(), ctx));
+                    }
+                    SyntaxKind::WHITESPACE => {
+                        if token.index() > 0 && children.peek().is_some() {
+                            match token.text().chars().filter(|c| *c == '\n').count() {
+                                0 => {
+                                    if prev_kind == SyntaxKind::COMMENT {
+                                        docs.push(Doc::hard_line());
+                                    }
+                                }
+                                1 => {
+                                    docs.push(Doc::hard_line());
+                                }
+                                _ => {
+                                    docs.push(Doc::empty_line());
+                                    docs.push(Doc::hard_line());
+                                }
+                            }
+                        }
+                    }
+                    _ => {}
+                },
+            }
+            prev_kind = kind;
+        }
+
         docs.push(Doc::hard_line());
         Doc::list(docs)
     }
@@ -1801,59 +1842,6 @@ impl DocGen for VariableDefinitions {
             ))
         }
     }
-}
-
-fn format_line_break_separated_list<N, Item, const SKIP_SIDE_WS: bool>(
-    node: &N,
-    ctx: &Ctx,
-) -> Vec<Doc<'static>>
-where
-    N: CstNode,
-    Item: CstNode + DocGen,
-{
-    let mut docs = Vec::with_capacity(2);
-
-    let mut children = node.syntax().children_with_tokens().peekable();
-    let mut prev_kind = SyntaxKind::WHITESPACE;
-    while let Some(element) = children.next() {
-        let kind = element.kind();
-        match element {
-            SyntaxElement::Node(node) => {
-                if should_ignore(&node, ctx) {
-                    reflow(&node.to_string(), &mut docs);
-                } else if let Some(item) = Item::cast(node) {
-                    docs.push(item.doc(ctx));
-                }
-            }
-            SyntaxElement::Token(token) => match token.kind() {
-                SyntaxKind::COMMENT => {
-                    docs.push(format_comment(token.to_string(), ctx));
-                }
-                SyntaxKind::WHITESPACE => {
-                    if !SKIP_SIDE_WS || token.index() > 0 && children.peek().is_some() {
-                        match token.text().chars().filter(|c| *c == '\n').count() {
-                            0 => {
-                                if prev_kind == SyntaxKind::COMMENT {
-                                    docs.push(Doc::hard_line());
-                                }
-                            }
-                            1 => {
-                                docs.push(Doc::hard_line());
-                            }
-                            _ => {
-                                docs.push(Doc::empty_line());
-                                docs.push(Doc::hard_line());
-                            }
-                        }
-                    }
-                }
-                _ => {}
-            },
-        }
-        prev_kind = kind;
-    }
-
-    docs
 }
 
 fn format_optional_comma_separated_list<N, Entry>(
