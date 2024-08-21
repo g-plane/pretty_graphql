@@ -1505,7 +1505,17 @@ impl DocGen for SelectionSet {
 
 impl DocGen for StringValue {
     fn doc(&self, _: &Ctx) -> Doc<'static> {
-        Doc::text(self.source_string())
+        let s = self.source_string();
+        if let Some(s) = s
+            .strip_prefix("\"\"\"")
+            .and_then(|s| s.strip_suffix("\"\"\""))
+        {
+            Doc::text("\"\"\"")
+                .concat(reflow_with_indent(s))
+                .append(Doc::text("\"\"\""))
+        } else {
+            Doc::text(s)
+        }
     }
 }
 
@@ -2302,6 +2312,40 @@ fn reflow(text: &str, docs: &mut Vec<Doc<'static>>) {
         docs.push(Doc::empty_line());
         docs.push(Doc::text(line.to_owned()));
     }
+}
+
+fn reflow_with_indent(s: &str) -> impl Iterator<Item = Doc<'static>> + '_ {
+    let indent = s
+        .lines()
+        .skip(if s.starts_with([' ', '\t']) { 0 } else { 1 })
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            line.as_bytes()
+                .iter()
+                .take_while(|byte| byte.is_ascii_whitespace())
+                .count()
+        })
+        .min()
+        .unwrap_or_default();
+    s.split('\n').enumerate().flat_map(move |(i, s)| {
+        let s = s.strip_suffix('\r').unwrap_or(s);
+        let s = if s.starts_with([' ', '\t']) {
+            s.get(indent..).unwrap_or(s)
+        } else {
+            s
+        };
+        [
+            if i == 0 {
+                Doc::nil()
+            } else if s.trim().is_empty() {
+                Doc::empty_line()
+            } else {
+                Doc::hard_line()
+            },
+            Doc::text(s.to_owned()),
+        ]
+        .into_iter()
+    })
 }
 
 fn should_ignore(node: &SyntaxNode, ctx: &Ctx) -> bool {
