@@ -65,7 +65,7 @@ impl DocGen for Arguments {
             .format(format_optional_comma_separated_list(
                 self,
                 self.arguments(),
-                Doc::line_or_space(),
+                ctx.options.arguments_single_line.as_ref(),
                 ctx.options.arguments_comma.as_ref(),
                 ctx,
             ))
@@ -88,7 +88,7 @@ impl DocGen for ArgumentsDefinition {
             .format(format_optional_comma_separated_list(
                 self,
                 self.input_value_definitions(),
-                Doc::line_or_space(),
+                ctx.options.arguments_definition_single_line.as_ref(),
                 ctx.options.arguments_definition_comma.as_ref(),
                 ctx,
             ))
@@ -266,37 +266,10 @@ impl DocGen for DirectiveLocations {
 
 impl DocGen for Directives {
     fn doc(&self, ctx: &Ctx) -> Doc<'static> {
-        let separator = match ctx
-            .options
-            .directives_single_line
-            .as_ref()
-            .unwrap_or(&ctx.options.single_line)
-        {
-            SingleLine::Prefer => Doc::line_or_space(),
-            SingleLine::Smart => {
-                if self
-                    .syntax()
-                    .first_child()
-                    .into_iter()
-                    .flat_map(|node| node.siblings_with_tokens(Direction::Next))
-                    .skip(1)
-                    .map_while(|element| element.into_token())
-                    .any(|token| {
-                        token.kind() == SyntaxKind::WHITESPACE
-                            && token.text().contains(['\n', '\r'])
-                    })
-                {
-                    Doc::hard_line()
-                } else {
-                    Doc::line_or_space()
-                }
-            }
-            SingleLine::Never => Doc::hard_line(),
-        };
         format_optional_comma_separated_list(
             self,
             self.directives(),
-            separator,
+            ctx.options.directives_single_line.as_ref(),
             ctx.options.directives_comma.as_ref(),
             ctx,
         )
@@ -465,7 +438,7 @@ impl DocGen for EnumValuesDefinition {
             .format(format_optional_comma_separated_list(
                 self,
                 self.enum_value_definitions(),
-                Doc::line_or_space(),
+                ctx.options.enum_values_definition_single_line.as_ref(),
                 ctx.options.enum_values_definition_comma.as_ref(),
                 ctx,
             ))
@@ -587,7 +560,7 @@ impl DocGen for FieldsDefinition {
             .format(format_optional_comma_separated_list(
                 self,
                 self.field_definitions(),
-                Doc::hard_line(),
+                ctx.options.fields_definition_single_line.as_ref(),
                 ctx.options.fields_definition_comma.as_ref(),
                 ctx,
             ))
@@ -767,7 +740,7 @@ impl DocGen for InputFieldsDefinition {
             .format(format_optional_comma_separated_list(
                 self,
                 self.input_value_definitions(),
-                Doc::hard_line(),
+                ctx.options.input_fields_definition_single_line.as_ref(),
                 ctx.options.input_fields_definition_comma.as_ref(),
                 ctx,
             ))
@@ -1055,7 +1028,7 @@ impl DocGen for ListValue {
             .format(format_optional_comma_separated_list(
                 self,
                 self.values(),
-                Doc::line_or_space(),
+                ctx.options.list_value_single_line.as_ref(),
                 ctx.options.list_value_comma.as_ref(),
                 ctx,
             ))
@@ -1258,7 +1231,7 @@ impl DocGen for ObjectValue {
             .format(format_optional_comma_separated_list(
                 self,
                 self.object_fields(),
-                Doc::line_or_space(),
+                ctx.options.object_value_single_line.as_ref(),
                 ctx.options.object_value_comma.as_ref(),
                 ctx,
             ))
@@ -1477,7 +1450,7 @@ impl DocGen for SchemaDefinition {
                 .format(format_optional_comma_separated_list(
                     self,
                     self.root_operation_type_definitions(),
-                    Doc::hard_line(),
+                    ctx.options.schema_definition_single_line.as_ref(),
                     ctx.options.schema_definition_comma.as_ref(),
                     ctx,
                 ))
@@ -1535,7 +1508,7 @@ impl DocGen for SchemaExtension {
                 .format(format_optional_comma_separated_list(
                     self,
                     self.root_operation_type_definitions(),
-                    Doc::hard_line(),
+                    ctx.options.schema_extension_single_line.as_ref(),
                     ctx.options.schema_extension_comma.as_ref(),
                     ctx,
                 ))
@@ -1568,7 +1541,7 @@ impl DocGen for SelectionSet {
         .format(format_optional_comma_separated_list(
             self,
             self.selections(),
-            Doc::hard_line(),
+            ctx.options.selection_set_single_line.as_ref(),
             ctx.options.selection_set_comma.as_ref(),
             ctx,
         ))
@@ -1822,7 +1795,7 @@ impl DocGen for VariableDefinitions {
             .format(format_optional_comma_separated_list(
                 self,
                 self.variable_definitions(),
-                Doc::line_or_space(),
+                ctx.options.variable_definitions_single_line.as_ref(),
                 ctx.options.variable_definitions_comma.as_ref(),
                 ctx,
             ))
@@ -1886,7 +1859,7 @@ where
 fn format_optional_comma_separated_list<N, Entry>(
     node: &N,
     entries: CstChildren<Entry>,
-    separator: Doc<'static>,
+    single_line: Option<&SingleLine>,
     comma: Option<&Comma>,
     ctx: &Ctx,
 ) -> Doc<'static>
@@ -1897,6 +1870,27 @@ where
     let node = node.syntax();
     let mut docs = vec![];
     let mut entries = entries.peekable();
+    let separator_space = match single_line.unwrap_or(&ctx.options.single_line) {
+        SingleLine::Prefer => Doc::line_or_space(),
+        SingleLine::Smart => {
+            if node
+                .first_child()
+                .into_iter()
+                .flat_map(|node| node.siblings_with_tokens(Direction::Next))
+                .skip(1)
+                .map_while(|element| element.into_token())
+                .any(|token| {
+                    token.kind() == SyntaxKind::WHITESPACE && token.text().contains(['\n', '\r'])
+                })
+            {
+                Doc::hard_line()
+            } else {
+                Doc::line_or_space()
+            }
+        }
+        SingleLine::Never => Doc::hard_line(),
+    };
+
     let mut commas = node
         .children_with_tokens()
         .filter_map(|element| match element {
@@ -1982,7 +1976,7 @@ where
                     ctx,
                 );
                 if trivia_docs.is_empty() {
-                    docs.push(separator.clone());
+                    docs.push(separator_space.clone());
                 } else {
                     docs.append(&mut trivia_docs);
                 }
@@ -2015,7 +2009,7 @@ where
                 }
             }
         } else if entries.peek().is_some() && !has_comment_before_comma && !has_last_line_break {
-            docs.push(separator.clone());
+            docs.push(separator_space.clone());
         }
     }
     Doc::list(docs)
