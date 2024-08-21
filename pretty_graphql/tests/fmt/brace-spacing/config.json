@@ -1,0 +1,21 @@
+{
+  "$schema": "../../test-schema.json",
+  "enabled": {
+    "braceSpacing": true,
+    "enumValuesDefinition.singleLine": "prefer"
+  },
+  "disabled": {
+    "braceSpacing": false,
+    "enumValuesDefinition.singleLine": "prefer"
+  },
+  "override-enabled": {
+    "braceSpacing": false,
+    "enumValuesDefinition.braceSpacing": true,
+    "enumValuesDefinition.singleLine": "prefer"
+  },
+  "override-disabled": {
+    "braceSpacing": true,
+    "enumValuesDefinition.braceSpacing": false,
+    "enumValuesDefinition.singleLine": "prefer"
+  }
+}

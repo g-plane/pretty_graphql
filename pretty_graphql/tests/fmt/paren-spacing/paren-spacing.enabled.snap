@@ -1,0 +1,6 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+query Query( $a: A ) @directive( key: "value" ) {
+  field
+}

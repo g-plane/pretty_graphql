@@ -465,7 +465,7 @@ impl DocGen for EnumValuesDefinition {
             .format(format_optional_comma_separated_list(
                 self,
                 self.enum_value_definitions(),
-                Doc::hard_line(),
+                Doc::line_or_space(),
                 ctx.options.enum_values_definition_comma.as_ref(),
                 ctx,
             ))

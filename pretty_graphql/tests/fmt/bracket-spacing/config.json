@@ -1,0 +1,9 @@
+{
+  "$schema": "../../test-schema.json",
+  "enabled": {
+    "bracketSpacing": true
+  },
+  "disabled": {
+    "bracketSpacing": false
+  }
+}

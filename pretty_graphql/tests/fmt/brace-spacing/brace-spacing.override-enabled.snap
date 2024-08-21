@@ -1,0 +1,8 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+query Query($object: Any = {key: "value"}) {
+  field
+}
+
+enum Enum { A B C }

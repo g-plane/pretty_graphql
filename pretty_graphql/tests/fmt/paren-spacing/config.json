@@ -1,0 +1,17 @@
+{
+  "$schema": "../../test-schema.json",
+  "enabled": {
+    "parenSpacing": true
+  },
+  "disabled": {
+    "parenSpacing": false
+  },
+  "override-enabled": {
+    "parenSpacing": false,
+    "variableDefinitions.parenSpacing": true
+  },
+  "override-disabled": {
+    "parenSpacing": true,
+    "variableDefinitions.parenSpacing": false
+  }
+}
