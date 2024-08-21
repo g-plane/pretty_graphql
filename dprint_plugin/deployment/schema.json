@@ -96,7 +96,7 @@
     },
     "objectValue.comma": {
       "$ref": "#/definitions/comma",
-      "default": "never"
+      "default": null
     },
     "schemaDefinition.comma": {
       "$ref": "#/definitions/comma",

@@ -354,7 +354,7 @@ impl Default for LanguageOptions {
             fields_definition_comma: Some(Comma::Never),
             input_fields_definition_comma: Some(Comma::Never),
             list_value_comma: None,
-            object_value_comma: Some(Comma::Never),
+            object_value_comma: None,
             schema_definition_comma: Some(Comma::Never),
             schema_extension_comma: Some(Comma::Never),
             selection_set_comma: Some(Comma::Never),
