@@ -1,0 +1,9 @@
+{
+  "$schema": "../../test-schema.json",
+  "enabled": {
+    "formatComments": true
+  },
+  "disabled": {
+    "formatComments": false
+  }
+}
