@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["pretty_graphql", "tree_inspector"]
+members = ["dprint_plugin", "pretty_graphql", "tree_inspector"]
 
 [profile.release]
 lto = true
