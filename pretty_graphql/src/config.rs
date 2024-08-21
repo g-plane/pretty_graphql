@@ -400,7 +400,9 @@ impl Default for LanguageOptions {
 pub enum Comma {
     Always,
     Never,
+    #[serde(alias = "noTrailing")]
     NoTrailing,
+    #[serde(alias = "onlySingleLine")]
     OnlySingleLine,
 }
 
