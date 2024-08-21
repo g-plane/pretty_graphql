@@ -1,0 +1,11 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+type User {
+  name: String
+  birthday: Int
+}
+
+extend type User {
+  age: Int
+}

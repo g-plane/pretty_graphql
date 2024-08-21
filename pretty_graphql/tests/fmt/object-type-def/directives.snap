@@ -1,0 +1,6 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+type PokemonType {
+  pokemon_type: String @mock(value: "Electric")
+}

@@ -1,0 +1,4 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+scalar Color @deprecated

@@ -1,0 +1,10 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+input Params {
+  # Id
+  id: ID
+
+  # Name
+  name: String
+}

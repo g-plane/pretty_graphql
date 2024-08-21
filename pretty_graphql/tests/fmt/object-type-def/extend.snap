@@ -1,0 +1,6 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+extend type Feedback {
+  custom_int: Int
+}

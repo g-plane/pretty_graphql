@@ -1,0 +1,7 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+input Params {
+  app_id: ID!
+  key_hash: String!
+}

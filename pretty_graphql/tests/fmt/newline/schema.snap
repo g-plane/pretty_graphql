@@ -1,0 +1,12 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+# Schema
+schema {
+  # Query and Mutation
+  query: Root
+  mutation: Mutation
+
+  # Subscription
+  subscription: Subscription
+}

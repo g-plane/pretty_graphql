@@ -1,0 +1,14 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+enum State {
+  # pending state
+  PENDING
+
+  # visible states
+  VISIBLE
+  INVISIBLE
+
+  # archive state
+  ARCHIVED
+}

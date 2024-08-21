@@ -1,0 +1,7 @@
+---
+source: pretty_graphql/tests/fmt.rs
+---
+type FeedHomeStories {
+  debug_info: String
+  query_title: String
+}
