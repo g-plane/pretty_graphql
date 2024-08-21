@@ -1,0 +1,7 @@
+{
+  "$schema": "../../test-schema.json",
+  "default": {},
+  "override": {
+    "ignoreCommentDirective": "dprint-ignore"
+  }
+}

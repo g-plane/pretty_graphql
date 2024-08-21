@@ -1904,7 +1904,12 @@ where
         });
     let comma = comma.unwrap_or(&ctx.options.comma);
     while let Some(entry) = entries.next() {
-        docs.push(entry.doc(ctx));
+        let entry_node = entry.syntax();
+        if should_ignore(entry_node, ctx) {
+            reflow(&entry_node.to_string(), &mut docs);
+        } else {
+            docs.push(entry.doc(ctx));
+        }
         match comma {
             Comma::Always => {
                 if entries.peek().is_some() {
