@@ -1581,6 +1581,7 @@ impl DocGen for StringValue {
         if let Some(s) = s
             .strip_prefix("\"\"\"")
             .and_then(|s| s.strip_suffix("\"\"\""))
+            .filter(|s| s.contains(['\n', '\r']))
         {
             Doc::text("\"\"\"")
                 .concat(reflow_with_indent(s))
