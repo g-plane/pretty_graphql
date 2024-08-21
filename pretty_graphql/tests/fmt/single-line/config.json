@@ -1,0 +1,36 @@
+{
+  "$schema": "../../test-schema.json",
+  "prefer": {
+    "singleLine": "prefer"
+  },
+  "smart": {
+    "singleLine": "smart"
+  },
+  "never": {
+    "singleLine": "never"
+  },
+  "override-prefer": {
+    "singleLine": "never",
+    "variableDefinitions.singleLine": "prefer"
+  },
+  "override-smart": {
+    "singleLine": "never",
+    "variableDefinitions.singleLine": "smart"
+  },
+  "override-never": {
+    "singleLine": "prefer",
+    "variableDefinitions.singleLine": "never"
+  },
+  "customized-prefer": {
+    "singleLine": "never",
+    "selectionSet.singleLine": "prefer"
+  },
+  "customized-smart": {
+    "singleLine": "never",
+    "selectionSet.singleLine": "smart"
+  },
+  "customized-never": {
+    "singleLine": "prefer",
+    "selectionSet.singleLine": "never"
+  }
+}
