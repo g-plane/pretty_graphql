@@ -192,7 +192,7 @@ impl DocGen for DirectiveDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -337,7 +337,7 @@ impl DocGen for EnumTypeDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -429,7 +429,7 @@ impl DocGen for EnumValueDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -535,7 +535,7 @@ impl DocGen for FieldDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -791,7 +791,7 @@ impl DocGen for InputObjectTypeDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -883,7 +883,7 @@ impl DocGen for InputValueDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -937,7 +937,7 @@ impl DocGen for InterfaceTypeDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -1142,7 +1142,7 @@ impl DocGen for ObjectTypeDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -1360,7 +1360,7 @@ impl DocGen for ScalarTypeDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -1438,7 +1438,7 @@ impl DocGen for SchemaDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
@@ -1666,7 +1666,7 @@ impl DocGen for UnionTypeDefinition {
                 {
                     docs.push(Doc::hard_line());
                 } else {
-                    docs.push(Doc::space());
+                    docs.push(Doc::soft_line());
                 }
             }
             docs.append(&mut trivias);
