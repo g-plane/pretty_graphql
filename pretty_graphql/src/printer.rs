@@ -1873,7 +1873,21 @@ where
     let separator_space = match single_line.unwrap_or(&ctx.options.single_line) {
         SingleLine::Prefer => Doc::line_or_space(),
         SingleLine::Smart => {
-            if node
+            if let Some(token) = node.first_token() {
+                if token
+                    .siblings_with_tokens(Direction::Next)
+                    .skip(1)
+                    .map_while(|element| element.into_token())
+                    .any(|token| {
+                        token.kind() == SyntaxKind::WHITESPACE
+                            && token.text().contains(['\n', '\r'])
+                    })
+                {
+                    Doc::hard_line()
+                } else {
+                    Doc::line_or_space()
+                }
+            } else if node
                 .first_child()
                 .into_iter()
                 .flat_map(|node| node.siblings_with_tokens(Direction::Next))
