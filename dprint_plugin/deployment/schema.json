@@ -6,33 +6,42 @@
   "type": "object",
   "definitions": {
     "comma": {
+      "description": "Control whether commas should be inserted inside a list of items.",
       "type": ["string", "null"],
       "oneOf": [
         {
-          "const": "always"
+          "const": "always",
+          "description": "Insert commas inside a list of items. For single line list, there won't be trailing comma; for multiple lines list, there will be trailing comma."
         },
         {
-          "const": "never"
+          "const": "never",
+          "description": "Do not insert commas inside a list of items. All existed commas will be removed."
         },
         {
-          "const": "noTrailing"
+          "const": "noTrailing",
+          "description": "Insert commas inside a list of items without trailing comma."
         },
         {
-          "const": "onlySingleLine"
+          "const": "onlySingleLine",
+          "description": "Insert commas inside a list of items only for single line list. For multiple lines list, there won't be commas."
         }
       ]
     },
     "singleLine": {
+      "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines, or force them to be on multiple lines.",
       "type": ["string", "null"],
       "oneOf": [
         {
-          "const": "prefer"
+          "const": "prefer",
+          "description": "Place items on single line as possible."
         },
         {
-          "const": "smart"
+          "const": "smart",
+          "description": "Whether items should be placed on single line will be determined by original layout."
         },
         {
-          "const": "never"
+          "const": "never",
+          "description": "Force items to be on multiple lines."
         }
       ]
     }
@@ -180,54 +189,67 @@
       "default": null
     },
     "parenSpacing": {
+      "description": "Control whether whitespace should be inserted between parentheses or not.",
       "type": "boolean",
       "default": false
     },
     "arguments.parenSpacing": {
+      "description": "Control whether whitespace should be inserted between parentheses or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "argumentsDefinition.parenSpacing": {
+      "description": "Control whether whitespace should be inserted between parentheses or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "variableDefinitions.parenSpacing": {
+      "description": "Control whether whitespace should be inserted between parentheses or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "bracketSpacing": {
+      "description": "Control whether whitespace should be inserted between brackets or not.",
       "type": "boolean",
       "default": false
     },
     "braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": "boolean",
       "default": true
     },
     "enumValuesDefinition.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "fieldsDefinition.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "inputFieldsDefinition.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "objectValue.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "schemaDefinition.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "schemaExtension.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
     "selectionSet.braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
       "type": ["boolean", "null"],
       "default": null
     },
