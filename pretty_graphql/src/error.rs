@@ -2,6 +2,7 @@ use apollo_parser::Error as ApolloError;
 use std::{cmp::Ordering, error, fmt, iter, ops::ControlFlow};
 
 #[derive(Clone, Debug)]
+/// Error wrapper type for `apollo-parser`.
 pub struct Error {
     pub(crate) errors: Vec<ApolloError>,
     pub(crate) input: String,

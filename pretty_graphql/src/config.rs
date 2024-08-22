@@ -1,4 +1,7 @@
 //! Types about configuration.
+//!
+//! For detailed documentation of configuration,
+//! please read [configuration documentation](https://pretty-graphql.netlify.app/).
 
 #[cfg(feature = "config_serde")]
 use serde::{Deserialize, Serialize};
@@ -7,8 +10,6 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "config_serde", serde(default))]
 /// The whole configuration of Pretty GraphQL.
-///
-/// For detail, please refer to [Configuration](https://github.com/g-plane/pretty_graphql/blob/main/docs/config.md) on GitHub.
 pub struct FormatOptions {
     #[cfg_attr(feature = "config_serde", serde(flatten))]
     pub layout: LayoutOptions,
