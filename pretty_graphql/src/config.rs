@@ -401,9 +401,9 @@ impl Default for LanguageOptions {
 pub enum Comma {
     Always,
     Never,
-    #[serde(alias = "noTrailing")]
+    #[cfg_attr(feature = "config_serde", serde(alias = "noTrailing"))]
     NoTrailing,
-    #[serde(alias = "onlySingleLine")]
+    #[cfg_attr(feature = "config_serde", serde(alias = "onlySingleLine"))]
     OnlySingleLine,
 }
 
