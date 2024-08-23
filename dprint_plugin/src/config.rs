@@ -126,7 +126,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             enum_values_definition_comma: get_nullable_value::<String>(
                 &mut config,
                 "enumValuesDefinition.comma",
@@ -145,7 +146,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             fields_definition_comma: get_nullable_value::<String>(
                 &mut config,
                 "fieldsDefinition.comma",
@@ -164,7 +166,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             input_fields_definition_comma: get_nullable_value::<String>(
                 &mut config,
                 "inputFieldsDefinition.comma",
@@ -183,7 +186,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             list_value_comma: get_nullable_value::<String>(
                 &mut config,
                 "listValue.comma",
@@ -240,7 +244,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             schema_extension_comma: get_nullable_value::<String>(
                 &mut config,
                 "schemaExtension.comma",
@@ -259,7 +264,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             selection_set_comma: get_nullable_value::<String>(
                 &mut config,
                 "selectionSet.comma",
@@ -278,7 +284,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(Comma::Never)
                 }
-            }),
+            })
+            .or(Some(Comma::Never)),
             variable_definitions_comma: get_nullable_value::<String>(
                 &mut config,
                 "variableDefinitions.comma",
@@ -405,7 +412,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(SingleLine::Never)
                 }
-            }),
+            })
+            .or(Some(SingleLine::Never)),
             fields_definition_single_line: get_nullable_value::<String>(
                 &mut config,
                 "fieldsDefinition.singleLine",
@@ -423,7 +431,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(SingleLine::Never)
                 }
-            }),
+            })
+            .or(Some(SingleLine::Never)),
             implements_interfaces_single_line: get_nullable_value::<String>(
                 &mut config,
                 "implementsInterfaces.singleLine",
@@ -461,7 +470,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(SingleLine::Never)
                 }
-            }),
+            })
+            .or(Some(SingleLine::Never)),
             list_value_single_line: get_nullable_value::<String>(
                 &mut config,
                 "listValue.singleLine",
@@ -515,7 +525,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(SingleLine::Never)
                 }
-            }),
+            })
+            .or(Some(SingleLine::Never)),
             schema_extension_single_line: get_nullable_value::<String>(
                 &mut config,
                 "schemaExtension.singleLine",
@@ -533,7 +544,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(SingleLine::Never)
                 }
-            }),
+            })
+            .or(Some(SingleLine::Never)),
             selection_set_single_line: get_nullable_value::<String>(
                 &mut config,
                 "selectionSet.singleLine",
@@ -551,7 +563,8 @@ pub(crate) fn resolve_config(
                     });
                     Some(SingleLine::Never)
                 }
-            }),
+            })
+            .or(Some(SingleLine::Never)),
             union_member_types_single_line: get_nullable_value::<String>(
                 &mut config,
                 "unionMemberTypes.singleLine",
