@@ -43,7 +43,7 @@ fn fmt_snapshot() {
 }
 
 fn run_format_test(path: &Path, input: &str, options: &FormatOptions) -> String {
-    let output = format_text(&input, &options)
+    let output = format_text(input, options)
         .map_err(|err| format!("failed to format '{}': {:?}", path.display(), err))
         .unwrap();
 
@@ -53,7 +53,7 @@ fn run_format_test(path: &Path, input: &str, options: &FormatOptions) -> String 
         path.display()
     );
 
-    let regression_format = format_text(&output, &options)
+    let regression_format = format_text(&output, options)
         .map_err(|err| {
             format!(
                 "syntax error in stability test '{}': {:?}",
