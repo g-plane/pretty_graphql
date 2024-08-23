@@ -44,6 +44,16 @@
           "description": "Force items to be on multiple lines."
         }
       ]
+    },
+    "parenSpacing": {
+      "description": "Control whether whitespace should be inserted between parentheses or not.",
+      "type": ["boolean", "null"],
+      "default": null
+    },
+    "braceSpacing": {
+      "description": "Control whether whitespace should be inserted between braces or not.",
+      "type": ["boolean", "null"],
+      "default": null
     }
   },
   "properties": {
@@ -189,24 +199,17 @@
       "default": null
     },
     "parenSpacing": {
-      "description": "Control whether whitespace should be inserted between parentheses or not.",
-      "type": "boolean",
-      "default": false
+      "$ref": "#/definitions/parenSpacing",
+      "type": "boolean"
     },
     "arguments.parenSpacing": {
-      "description": "Control whether whitespace should be inserted between parentheses or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/parenSpacing"
     },
     "argumentsDefinition.parenSpacing": {
-      "description": "Control whether whitespace should be inserted between parentheses or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/parenSpacing"
     },
     "variableDefinitions.parenSpacing": {
-      "description": "Control whether whitespace should be inserted between parentheses or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/parenSpacing"
     },
     "bracketSpacing": {
       "description": "Control whether whitespace should be inserted between brackets or not.",
@@ -214,44 +217,29 @@
       "default": false
     },
     "braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": "boolean",
-      "default": true
+      "$ref": "#/definitions/braceSpacing",
+      "type": "boolean"
     },
     "enumValuesDefinition.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "fieldsDefinition.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "inputFieldsDefinition.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "objectValue.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "schemaDefinition.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "schemaExtension.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "selectionSet.braceSpacing": {
-      "description": "Control whether whitespace should be inserted between braces or not.",
-      "type": ["boolean", "null"],
-      "default": null
+      "$ref": "#/definitions/braceSpacing"
     },
     "formatComments": {
       "description": "Control whether whitespace should be inserted at the beginning of comments or not.",
@@ -261,7 +249,7 @@
     "ignoreCommentDirective": {
       "description": "Text directive for ignoring formatting specific content.",
       "type": "string",
-      "default": "pretty-graphql-ignore"
+      "default": "dprint-ignore"
     }
   }
 }
