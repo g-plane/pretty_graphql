@@ -9,11 +9,12 @@ Possible option values:
 - `"never"`: Do not insert commas inside a list of items. All existed commas will be removed.
 - `"noTrailing"`: Insert commas inside a list of items without trailing comma.
 - `"onlySingleLine"`: Insert commas inside a list of items only for single line list. For multiple lines list, there won't be commas.
+- `"inherit"`: Inherit from the base `comma` option.
 
 Default option value is `"onlySingleLine"`.
 
 This global option can be overridden by different syntax nodes.
-Some syntax-node-specific options will override by default:
+Some syntax-node-specific options will override by default instead of `"inherit"`:
 
 - `arguments.comma`
 - `argumentsDefinition.comma`

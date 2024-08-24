@@ -74,7 +74,7 @@ impl From<LineBreak> for tiny_pretty::LineBreak {
 pub struct LanguageOptions {
     pub comma: Comma,
     #[cfg_attr(feature = "config_serde", serde(alias = "arguments.comma"))]
-    pub arguments_comma: Option<Comma>,
+    pub arguments_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -82,9 +82,9 @@ pub struct LanguageOptions {
             alias = "argumentsDefinition.comma"
         )
     )]
-    pub arguments_definition_comma: Option<Comma>,
+    pub arguments_definition_comma: Comma,
     #[cfg_attr(feature = "config_serde", serde(alias = "directives.comma"))]
-    pub directives_comma: Option<Comma>,
+    pub directives_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -92,12 +92,12 @@ pub struct LanguageOptions {
             alias = "enumValuesDefinition.comma"
         )
     )]
-    pub enum_values_definition_comma: Option<Comma>,
+    pub enum_values_definition_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "fields_definition.comma", alias = "fieldsDefinition.comma")
     )]
-    pub fields_definition_comma: Option<Comma>,
+    pub fields_definition_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -105,32 +105,32 @@ pub struct LanguageOptions {
             alias = "inputFieldsDefinition.comma"
         )
     )]
-    pub input_fields_definition_comma: Option<Comma>,
+    pub input_fields_definition_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "list_value.comma", alias = "listValue.comma")
     )]
-    pub list_value_comma: Option<Comma>,
+    pub list_value_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "object_value.comma", alias = "objectValue.comma")
     )]
-    pub object_value_comma: Option<Comma>,
+    pub object_value_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "schema_definition.comma", alias = "schemaDefinition.comma")
     )]
-    pub schema_definition_comma: Option<Comma>,
+    pub schema_definition_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "schema_extension.comma", alias = "schemaExtension.comma")
     )]
-    pub schema_extension_comma: Option<Comma>,
+    pub schema_extension_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "selection_set.comma", alias = "selectionSet.comma")
     )]
-    pub selection_set_comma: Option<Comma>,
+    pub selection_set_comma: Comma,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -138,7 +138,7 @@ pub struct LanguageOptions {
             alias = "variableDefinitions.comma"
         )
     )]
-    pub variable_definitions_comma: Option<Comma>,
+    pub variable_definitions_comma: Comma,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "singleLine"))]
     pub single_line: SingleLine,
@@ -146,7 +146,7 @@ pub struct LanguageOptions {
         feature = "config_serde",
         serde(rename = "arguments.single_line", alias = "arguments.singleLine")
     )]
-    pub arguments_single_line: Option<SingleLine>,
+    pub arguments_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -154,7 +154,7 @@ pub struct LanguageOptions {
             alias = "argumentsDefinition.singleLine"
         )
     )]
-    pub arguments_definition_single_line: Option<SingleLine>,
+    pub arguments_definition_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -162,7 +162,7 @@ pub struct LanguageOptions {
             alias = "enumValuesDefinition.singleLine"
         )
     )]
-    pub enum_values_definition_single_line: Option<SingleLine>,
+    pub enum_values_definition_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -170,12 +170,12 @@ pub struct LanguageOptions {
             alias = "directiveLocations.singleLine"
         )
     )]
-    pub directive_locations_single_line: Option<SingleLine>,
+    pub directive_locations_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "directives.single_line", alias = "directives.singleLine")
     )]
-    pub directives_single_line: Option<SingleLine>,
+    pub directives_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -183,7 +183,7 @@ pub struct LanguageOptions {
             alias = "fieldsDefinition.singleLine"
         )
     )]
-    pub fields_definition_single_line: Option<SingleLine>,
+    pub fields_definition_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -191,7 +191,7 @@ pub struct LanguageOptions {
             alias = "implementsInterfaces.singleLine"
         )
     )]
-    pub implements_interfaces_single_line: Option<SingleLine>,
+    pub implements_interfaces_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -199,17 +199,17 @@ pub struct LanguageOptions {
             alias = "inputFieldsDefinition.singleLine"
         )
     )]
-    pub input_fields_definition_single_line: Option<SingleLine>,
+    pub input_fields_definition_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "list_value.single_line", alias = "listValue.singleLine")
     )]
-    pub list_value_single_line: Option<SingleLine>,
+    pub list_value_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(rename = "object_value.single_line", alias = "objectValue.singleLine")
     )]
-    pub object_value_single_line: Option<SingleLine>,
+    pub object_value_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -217,7 +217,7 @@ pub struct LanguageOptions {
             alias = "schemaDefinition.singleLine"
         )
     )]
-    pub schema_definition_single_line: Option<SingleLine>,
+    pub schema_definition_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -225,7 +225,7 @@ pub struct LanguageOptions {
             alias = "schemaExtension.singleLine"
         )
     )]
-    pub schema_extension_single_line: Option<SingleLine>,
+    pub schema_extension_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -233,7 +233,7 @@ pub struct LanguageOptions {
             alias = "selectionSet.singleLine"
         )
     )]
-    pub selection_set_single_line: Option<SingleLine>,
+    pub selection_set_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -241,7 +241,7 @@ pub struct LanguageOptions {
             alias = "unionMemberTypes.singleLine"
         )
     )]
-    pub union_member_types_single_line: Option<SingleLine>,
+    pub union_member_types_single_line: SingleLine,
     #[cfg_attr(
         feature = "config_serde",
         serde(
@@ -249,7 +249,7 @@ pub struct LanguageOptions {
             alias = "variableDefinitions.singleLine"
         )
     )]
-    pub variable_definitions_single_line: Option<SingleLine>,
+    pub variable_definitions_single_line: SingleLine,
 
     #[cfg_attr(feature = "config_serde", serde(alias = "parenSpacing"))]
     pub paren_spacing: bool,
@@ -348,34 +348,34 @@ impl Default for LanguageOptions {
     fn default() -> Self {
         LanguageOptions {
             comma: Comma::OnlySingleLine,
-            arguments_comma: None,
-            arguments_definition_comma: None,
-            directives_comma: Some(Comma::Never),
-            enum_values_definition_comma: Some(Comma::Never),
-            fields_definition_comma: Some(Comma::Never),
-            input_fields_definition_comma: Some(Comma::Never),
-            list_value_comma: None,
-            object_value_comma: None,
-            schema_definition_comma: Some(Comma::Never),
-            schema_extension_comma: Some(Comma::Never),
-            selection_set_comma: Some(Comma::Never),
-            variable_definitions_comma: None,
+            arguments_comma: Comma::Inherit,
+            arguments_definition_comma: Comma::Inherit,
+            directives_comma: Comma::Never,
+            enum_values_definition_comma: Comma::Never,
+            fields_definition_comma: Comma::Never,
+            input_fields_definition_comma: Comma::Never,
+            list_value_comma: Comma::Inherit,
+            object_value_comma: Comma::Inherit,
+            schema_definition_comma: Comma::Never,
+            schema_extension_comma: Comma::Never,
+            selection_set_comma: Comma::Never,
+            variable_definitions_comma: Comma::Inherit,
             single_line: SingleLine::Smart,
-            arguments_single_line: None,
-            arguments_definition_single_line: None,
-            directive_locations_single_line: None,
-            directives_single_line: None,
-            enum_values_definition_single_line: Some(SingleLine::Never),
-            fields_definition_single_line: Some(SingleLine::Never),
-            implements_interfaces_single_line: None,
-            input_fields_definition_single_line: Some(SingleLine::Never),
-            list_value_single_line: None,
-            object_value_single_line: None,
-            schema_definition_single_line: Some(SingleLine::Never),
-            schema_extension_single_line: Some(SingleLine::Never),
-            selection_set_single_line: Some(SingleLine::Never),
-            union_member_types_single_line: None,
-            variable_definitions_single_line: None,
+            arguments_single_line: SingleLine::Inherit,
+            arguments_definition_single_line: SingleLine::Inherit,
+            directive_locations_single_line: SingleLine::Inherit,
+            directives_single_line: SingleLine::Inherit,
+            enum_values_definition_single_line: SingleLine::Never,
+            fields_definition_single_line: SingleLine::Never,
+            implements_interfaces_single_line: SingleLine::Inherit,
+            input_fields_definition_single_line: SingleLine::Never,
+            list_value_single_line: SingleLine::Inherit,
+            object_value_single_line: SingleLine::Inherit,
+            schema_definition_single_line: SingleLine::Never,
+            schema_extension_single_line: SingleLine::Never,
+            selection_set_single_line: SingleLine::Never,
+            union_member_types_single_line: SingleLine::Inherit,
+            variable_definitions_single_line: SingleLine::Inherit,
             paren_spacing: false,
             arguments_paren_spacing: None,
             arguments_definition_paren_spacing: None,
@@ -405,6 +405,7 @@ pub enum Comma {
     NoTrailing,
     #[cfg_attr(feature = "config_serde", serde(alias = "onlySingleLine"))]
     OnlySingleLine,
+    Inherit,
 }
 
 #[derive(Clone, Debug)]
@@ -414,4 +415,5 @@ pub enum SingleLine {
     Prefer,
     Smart,
     Never,
+    Inherit,
 }

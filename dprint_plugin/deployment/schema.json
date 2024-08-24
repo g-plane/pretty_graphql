@@ -7,7 +7,7 @@
   "definitions": {
     "comma": {
       "description": "Control whether commas should be inserted inside a list of items.",
-      "type": ["string", "null"],
+      "type": "string",
       "oneOf": [
         {
           "const": "always",
@@ -24,12 +24,16 @@
         {
           "const": "onlySingleLine",
           "description": "Insert commas inside a list of items only for single line list. For multiple lines list, there won't be commas."
+        },
+        {
+          "const": "inherit",
+          "description": "Inherit from the base `comma` option."
         }
       ]
     },
     "singleLine": {
       "description": "Control whether items should be placed on single line as possible, even they're originally on multiple lines, or force them to be on multiple lines.",
-      "type": ["string", "null"],
+      "type": "string",
       "oneOf": [
         {
           "const": "prefer",
@@ -42,6 +46,10 @@
         {
           "const": "never",
           "description": "Force items to be on multiple lines."
+        },
+        {
+          "const": "inherit",
+          "description": "Inherit from the base `singleLine` option."
         }
       ]
     },
@@ -82,16 +90,15 @@
     },
     "comma": {
       "$ref": "#/definitions/comma",
-      "type": "string",
       "default": "onlySingleLine"
     },
     "arguments.comma": {
       "$ref": "#/definitions/comma",
-      "default": null
+      "default": "inherit"
     },
     "argumentsDefinition.comma": {
       "$ref": "#/definitions/comma",
-      "default": null
+      "default": "inherit"
     },
     "directives.comma": {
       "$ref": "#/definitions/comma",
@@ -111,11 +118,11 @@
     },
     "listValue.comma": {
       "$ref": "#/definitions/comma",
-      "default": null
+      "default": "inherit"
     },
     "objectValue.comma": {
       "$ref": "#/definitions/comma",
-      "default": null
+      "default": "inherit"
     },
     "schemaDefinition.comma": {
       "$ref": "#/definitions/comma",
@@ -131,28 +138,27 @@
     },
     "variableDefinitions.comma": {
       "$ref": "#/definitions/comma",
-      "default": null
+      "default": "inherit"
     },
     "singleLine": {
       "$ref": "#/definitions/singleLine",
-      "type": "string",
       "default": "smart"
     },
     "arguments.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "argumentsDefinition.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "directiveLocations.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "directives.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "enumValuesDefinition.singleLine": {
       "$ref": "#/definitions/singleLine",
@@ -164,7 +170,7 @@
     },
     "implementsInterfaces.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "inputFieldsDefinition.singleLine": {
       "$ref": "#/definitions/singleLine",
@@ -172,11 +178,11 @@
     },
     "listValue.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "objectValue.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "schemaDefinition.singleLine": {
       "$ref": "#/definitions/singleLine",
@@ -192,11 +198,11 @@
     },
     "unionMemberTypes.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "variableDefinitions.singleLine": {
       "$ref": "#/definitions/singleLine",
-      "default": null
+      "default": "inherit"
     },
     "parenSpacing": {
       "$ref": "#/definitions/parenSpacing",

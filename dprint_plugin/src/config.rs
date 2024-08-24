@@ -62,6 +62,7 @@ pub(crate) fn resolve_config(
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "comma".into(),
@@ -70,55 +71,55 @@ pub(crate) fn resolve_config(
                     Comma::OnlySingleLine
                 }
             },
-            arguments_comma: get_nullable_value::<String>(
+            arguments_comma: match &*get_value(
                 &mut config,
                 "arguments.comma",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "always" => Some(Comma::Always),
-                "never" => Some(Comma::Never),
-                "noTrailing" => Some(Comma::NoTrailing),
-                "onlySingleLine" => Some(Comma::OnlySingleLine),
+            ) {
+                "always" => Comma::Always,
+                "never" => Comma::Never,
+                "noTrailing" => Comma::NoTrailing,
+                "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "arguments.comma".into(),
                         message: "invalid value for config `arguments.comma`".into(),
                     });
-                    None
+                    Comma::Inherit
                 }
-            }),
-            arguments_definition_comma: get_nullable_value::<String>(
+            },
+            arguments_definition_comma: match &*get_value(
                 &mut config,
                 "argumentsDefinition.comma",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "always" => Some(Comma::Always),
-                "never" => Some(Comma::Never),
-                "noTrailing" => Some(Comma::NoTrailing),
-                "onlySingleLine" => Some(Comma::OnlySingleLine),
+            ) {
+                "always" => Comma::Always,
+                "never" => Comma::Never,
+                "noTrailing" => Comma::NoTrailing,
+                "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "argumentsDefinition.comma".into(),
                         message: "invalid value for config `argumentsDefinition.comma`".into(),
                     });
-                    None
+                    Comma::Inherit
                 }
-            }),
-            directives_comma: get_nullable_value::<String>(
+            },
+            directives_comma: match &*get_value(
                 &mut config,
                 "directives.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "directives.comma".into(),
@@ -126,19 +127,18 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            enum_values_definition_comma: get_nullable_value::<String>(
+            },
+            enum_values_definition_comma: match &*get_value(
                 &mut config,
                 "enumValuesDefinition.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "enumValuesDefinition.comma".into(),
@@ -146,19 +146,18 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            fields_definition_comma: get_nullable_value::<String>(
+            },
+            fields_definition_comma: match &*get_value(
                 &mut config,
                 "fieldsDefinition.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "fieldsDefinition.comma".into(),
@@ -166,19 +165,18 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            input_fields_definition_comma: get_nullable_value::<String>(
+            },
+            input_fields_definition_comma: match &*get_value(
                 &mut config,
                 "inputFieldsDefinition.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "inputFieldsDefinition.comma".into(),
@@ -186,57 +184,56 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            list_value_comma: get_nullable_value::<String>(
+            },
+            list_value_comma: match &*get_value(
                 &mut config,
                 "listValue.comma",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "always" => Some(Comma::Always),
-                "never" => Some(Comma::Never),
-                "noTrailing" => Some(Comma::NoTrailing),
-                "onlySingleLine" => Some(Comma::OnlySingleLine),
+            ) {
+                "always" => Comma::Always,
+                "never" => Comma::Never,
+                "noTrailing" => Comma::NoTrailing,
+                "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "listValue.comma".into(),
                         message: "invalid value for config `listValue.comma`".into(),
                     });
-                    None
+                    Comma::Inherit
                 }
-            }),
-            object_value_comma: get_nullable_value::<String>(
+            },
+            object_value_comma: match &*get_value(
                 &mut config,
                 "objectValue.comma",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "always" => Some(Comma::Always),
-                "never" => Some(Comma::Never),
-                "noTrailing" => Some(Comma::NoTrailing),
-                "onlySingleLine" => Some(Comma::OnlySingleLine),
+            ) {
+                "always" => Comma::Always,
+                "never" => Comma::Never,
+                "noTrailing" => Comma::NoTrailing,
+                "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "objectValue.comma".into(),
                         message: "invalid value for config `objectValue.comma`".into(),
                     });
-                    None
+                    Comma::Inherit
                 }
-            }),
-            schema_definition_comma: get_nullable_value::<String>(
+            },
+            schema_definition_comma: match &*get_value(
                 &mut config,
                 "schemaDefinition.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "schemaDefinition.comma".into(),
@@ -244,19 +241,18 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            schema_extension_comma: get_nullable_value::<String>(
+            },
+            schema_extension_comma: match &*get_value(
                 &mut config,
                 "schemaExtension.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "schemaExtension.comma".into(),
@@ -264,19 +260,18 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            selection_set_comma: get_nullable_value::<String>(
+            },
+            selection_set_comma: match &*get_value(
                 &mut config,
                 "selectionSet.comma",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "always" => Comma::Always,
                 "never" => Comma::Never,
                 "noTrailing" => Comma::NoTrailing,
                 "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "selectionSet.comma".into(),
@@ -284,27 +279,26 @@ pub(crate) fn resolve_config(
                     });
                     Comma::Never
                 }
-            })
-            .or(Some(Comma::Never)),
-            variable_definitions_comma: get_nullable_value::<String>(
+            },
+            variable_definitions_comma: match &*get_value(
                 &mut config,
                 "variableDefinitions.comma",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "always" => Some(Comma::Always),
-                "never" => Some(Comma::Never),
-                "noTrailing" => Some(Comma::NoTrailing),
-                "onlySingleLine" => Some(Comma::OnlySingleLine),
+            ) {
+                "always" => Comma::Always,
+                "never" => Comma::Never,
+                "noTrailing" => Comma::NoTrailing,
+                "onlySingleLine" => Comma::OnlySingleLine,
+                "inherit" => Comma::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "variableDefinitions.comma".into(),
                         message: "invalid value for config `variableDefinitions.comma`".into(),
                     });
-                    None
+                    Comma::Inherit
                 }
-            }),
+            },
             single_line: match &*get_value(
                 &mut config,
                 "singleLine",
@@ -314,6 +308,7 @@ pub(crate) fn resolve_config(
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "singleLine".into(),
@@ -322,88 +317,88 @@ pub(crate) fn resolve_config(
                     SingleLine::Smart
                 }
             },
-            arguments_single_line: get_nullable_value::<String>(
+            arguments_single_line: match &*get_value(
                 &mut config,
                 "arguments.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "arguments.singleLine".into(),
                         message: "invalid value for config `arguments.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            arguments_definition_single_line: get_nullable_value::<String>(
+            },
+            arguments_definition_single_line: match &*get_value(
                 &mut config,
                 "argumentsDefinition.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "argumentsDefinition.singleLine".into(),
                         message: "invalid value for config `argumentsDefinition.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            directive_locations_single_line: get_nullable_value::<String>(
+            },
+            directive_locations_single_line: match &*get_value(
                 &mut config,
                 "directiveLocations.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "directiveLocations.singleLine".into(),
                         message: "invalid value for config `directiveLocations.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            directives_single_line: get_nullable_value::<String>(
+            },
+            directives_single_line: match &*get_value(
                 &mut config,
                 "directives.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "directives.singleLine".into(),
                         message: "invalid value for config `directives.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            enum_values_definition_single_line: get_nullable_value::<String>(
+            },
+            enum_values_definition_single_line: match &*get_value(
                 &mut config,
                 "enumValuesDefinition.singleLine",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "enumValuesDefinition.singleLine".into(),
@@ -412,18 +407,17 @@ pub(crate) fn resolve_config(
                     });
                     SingleLine::Never
                 }
-            })
-            .or(Some(SingleLine::Never)),
-            fields_definition_single_line: get_nullable_value::<String>(
+            },
+            fields_definition_single_line: match &*get_value(
                 &mut config,
                 "fieldsDefinition.singleLine",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "fieldsDefinition.singleLine".into(),
@@ -431,37 +425,36 @@ pub(crate) fn resolve_config(
                     });
                     SingleLine::Never
                 }
-            })
-            .or(Some(SingleLine::Never)),
-            implements_interfaces_single_line: get_nullable_value::<String>(
+            },
+            implements_interfaces_single_line: match &*get_value(
                 &mut config,
                 "implementsInterfaces.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "implementsInterfaces.singleLine".into(),
                         message: "invalid value for config `implementsInterfaces.singleLine`"
                             .into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            input_fields_definition_single_line: get_nullable_value::<String>(
+            },
+            input_fields_definition_single_line: match &*get_value(
                 &mut config,
                 "inputFieldsDefinition.singleLine",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "inputFieldsDefinition.singleLine".into(),
@@ -470,54 +463,53 @@ pub(crate) fn resolve_config(
                     });
                     SingleLine::Never
                 }
-            })
-            .or(Some(SingleLine::Never)),
-            list_value_single_line: get_nullable_value::<String>(
+            },
+            list_value_single_line: match &*get_value(
                 &mut config,
                 "listValue.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "listValue.singleLine".into(),
                         message: "invalid value for config `listValue.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            object_value_single_line: get_nullable_value::<String>(
+            },
+            object_value_single_line: match &*get_value(
                 &mut config,
                 "objectValue.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "objectValue.singleLine".into(),
                         message: "invalid value for config `objectValue.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            schema_definition_single_line: get_nullable_value::<String>(
+            },
+            schema_definition_single_line: match &*get_value(
                 &mut config,
                 "schemaDefinition.singleLine",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "schemaDefinition.singleLine".into(),
@@ -525,18 +517,17 @@ pub(crate) fn resolve_config(
                     });
                     SingleLine::Never
                 }
-            })
-            .or(Some(SingleLine::Never)),
-            schema_extension_single_line: get_nullable_value::<String>(
+            },
+            schema_extension_single_line: match &*get_value(
                 &mut config,
                 "schemaExtension.singleLine",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "schemaExtension.singleLine".into(),
@@ -544,18 +535,17 @@ pub(crate) fn resolve_config(
                     });
                     SingleLine::Never
                 }
-            })
-            .or(Some(SingleLine::Never)),
-            selection_set_single_line: get_nullable_value::<String>(
+            },
+            selection_set_single_line: match &*get_value(
                 &mut config,
                 "selectionSet.singleLine",
+                "never".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .map(|option_value| match option_value {
+            ) {
                 "prefer" => SingleLine::Prefer,
                 "smart" => SingleLine::Smart,
                 "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "selectionSet.singleLine".into(),
@@ -563,44 +553,43 @@ pub(crate) fn resolve_config(
                     });
                     SingleLine::Never
                 }
-            })
-            .or(Some(SingleLine::Never)),
-            union_member_types_single_line: get_nullable_value::<String>(
+            },
+            union_member_types_single_line: match &*get_value(
                 &mut config,
                 "unionMemberTypes.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "unionMemberTypes.singleLine".into(),
                         message: "invalid value for config `unionMemberTypes.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
-            variable_definitions_single_line: get_nullable_value::<String>(
+            },
+            variable_definitions_single_line: match &*get_value(
                 &mut config,
                 "variableDefinitions.singleLine",
+                "inherit".to_string(),
                 &mut diagnostics,
-            )
-            .as_deref()
-            .and_then(|option_value| match option_value {
-                "prefer" => Some(SingleLine::Prefer),
-                "smart" => Some(SingleLine::Smart),
-                "never" => Some(SingleLine::Never),
+            ) {
+                "prefer" => SingleLine::Prefer,
+                "smart" => SingleLine::Smart,
+                "never" => SingleLine::Never,
+                "inherit" => SingleLine::Inherit,
                 _ => {
                     diagnostics.push(ConfigurationDiagnostic {
                         property_name: "variableDefinitions.singleLine".into(),
                         message: "invalid value for config `variableDefinitions.singleLine`".into(),
                     });
-                    None
+                    SingleLine::Inherit
                 }
-            }),
+            },
             paren_spacing: get_value(&mut config, "parenSpacing", false, &mut diagnostics),
             arguments_paren_spacing: get_nullable_value(
                 &mut config,

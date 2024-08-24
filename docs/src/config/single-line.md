@@ -8,11 +8,12 @@ Possible option values:
 - `"prefer"`: Place items on single line as possible.
 - `"smart"`: Whether items should be placed on single line will be determined by original layout.
 - `"never"`: Force items to be on multiple lines.
+- `"inherit"`: Inherit from the base `singleLine` option.
 
 Default option value is `"smart"`.
 
 This global option can be overridden by different syntax nodes.
-Some syntax-node-specific options will override by default:
+Some syntax-node-specific options will override by default instead of `"inherit"`:
 
 - `arguments.singleLine`
 - `argumentsDefinition.singleLine`
