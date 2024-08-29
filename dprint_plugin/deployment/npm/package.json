@@ -1,0 +1,20 @@
+{
+  "name": "dprint-plugin-graphql",
+  "description": "Pretty GraphQL as dprint plugin.",
+  "version": "0.2.0",
+  "author": "Pig Fang <g-plane@hotmail.com>",
+  "repository": "g-plane/pretty_graphql",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "dprint",
+    "dprint-plugin"
+  ],
+  "files": [
+    "*.wasm"
+  ],
+  "exports": {
+    "./plugin.wasm": "./plugin.wasm",
+    "./package.json": "./package.json"
+  }
+}
