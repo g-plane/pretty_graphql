@@ -3,3 +3,7 @@ source: pretty_graphql/tests/fmt.rs
 ---
 #comment
 # comment
+
+query {
+  field
+}
