@@ -1598,7 +1598,7 @@ impl DocGen for StringValue {
             .filter(|s| s.contains(['\n', '\r']))
         {
             Doc::text("\"\"\"")
-                .concat(reflow_with_indent(s))
+                .concat(reflow_with_indent(s).into_iter())
                 .append(Doc::text("\"\"\""))
         } else {
             Doc::text(s)
@@ -2416,7 +2416,7 @@ fn reflow(text: &str, docs: &mut Vec<Doc<'static>>) {
     }
 }
 
-fn reflow_with_indent(s: &str) -> impl Iterator<Item = Doc<'static>> + '_ {
+fn reflow_with_indent(s: &str) -> Vec<Doc<'static>> {
     let indent = s
         .lines()
         .skip(if s.starts_with([' ', '\t']) { 0 } else { 1 })
@@ -2429,25 +2429,25 @@ fn reflow_with_indent(s: &str) -> impl Iterator<Item = Doc<'static>> + '_ {
         })
         .min()
         .unwrap_or_default();
-    s.split('\n').enumerate().flat_map(move |(i, s)| {
-        let s = s.strip_suffix('\r').unwrap_or(s);
-        let s = if s.starts_with([' ', '\t']) {
+    let mut docs = Vec::with_capacity(2);
+    let mut lines = s.split('\n').enumerate().peekable();
+    while let Some((i, line)) = lines.next() {
+        let s = line.strip_suffix('\r').unwrap_or(line);
+        let s = if s.starts_with([' ', '\t']) && i > 0 {
             s.get(indent..).unwrap_or(s)
         } else {
             s
         };
-        [
-            if i == 0 {
-                Doc::nil()
-            } else if s.trim().is_empty() {
-                Doc::empty_line()
+        if i > 0 {
+            if s.trim().is_empty() && lines.peek().is_some() {
+                docs.push(Doc::empty_line());
             } else {
-                Doc::hard_line()
-            },
-            Doc::text(s.to_owned()),
-        ]
-        .into_iter()
-    })
+                docs.push(Doc::hard_line());
+            }
+        }
+        docs.push(Doc::text(s.to_owned()));
+    }
+    docs
 }
 
 fn should_ignore(node: &SyntaxNode, ctx: &Ctx) -> bool {

@@ -56,7 +56,7 @@ fragment frag on Friend {
       key: "value"
       block: """
       block string uses \"""
-  """
+        """
     }
   )
 }

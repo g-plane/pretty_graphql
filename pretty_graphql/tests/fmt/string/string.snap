@@ -30,7 +30,7 @@ type Foo {
   """
   This is a description
   of the `one` field.
-"""
+  """
   one: Type
 }
 
@@ -49,14 +49,14 @@ type Foo {
 enum Enum {
   """
   Description of `one`
-"""
+  """
   one
 }
 
 input Input {
   """
   Description of `one`
-"""
+  """
   one: string
 }
 
@@ -77,3 +77,10 @@ input Input {
     id
   }
 }
+
+directive @constraint(
+  """
+  min length
+  """
+  minLength: Int
+) on INPUT_FIELD_DEFINITION

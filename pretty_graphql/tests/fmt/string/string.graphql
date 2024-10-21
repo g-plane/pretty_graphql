@@ -58,3 +58,10 @@ one: string
 {
   foo(input: {multiline: """    """}) { id }
 }
+
+directive @constraint(
+  """
+  min length
+  """
+  minLength: Int
+) on INPUT_FIELD_DEFINITION
