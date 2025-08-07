@@ -26,8 +26,7 @@ impl SyncPluginHandler<FormatOptions> for PrettyGraphqlPluginHandler {
                 config_key: "graphql".into(),
                 help_url: "https://github.com/g-plane/pretty_graphql".into(),
                 config_schema_url: format!(
-                    "https://plugins.dprint.dev/g-plane/pretty_graphql/v{}/schema.json",
-                    version
+                    "https://plugins.dprint.dev/g-plane/pretty_graphql/v{version}/schema.json"
                 ),
                 update_url: Some(
                     "https://plugins.dprint.dev/g-plane/pretty_graphql/latest.json".into(),

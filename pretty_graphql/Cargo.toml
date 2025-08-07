@@ -12,7 +12,7 @@ exclude = ["/tests"]
 [dependencies]
 apollo-parser = "0.8"
 memchr = "2.7"
-rowan = "0.15"
+rowan = "0.16"
 serde = { version = "1.0", features = ["derive"], optional = true }
 tiny_pretty = "0.2"
 
