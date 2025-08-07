@@ -25,7 +25,7 @@ After adding the dprint plugin, update your `dprint.json` and add configuration:
     // Pretty GraphQL config comes here
   },
   "plugins": [
-    "https://plugins.dprint.dev/g-plane/pretty_graphql-v0.2.1.wasm"
+    "https://plugins.dprint.dev/g-plane/pretty_graphql-v0.2.2.wasm"
   ]
 }
 ```
