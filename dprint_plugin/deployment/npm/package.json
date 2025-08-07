@@ -1,7 +1,7 @@
 {
   "name": "dprint-plugin-graphql",
   "description": "Pretty GraphQL as dprint plugin.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "Pig Fang <g-plane@hotmail.com>",
   "repository": "g-plane/pretty_graphql",
   "license": "MIT",
