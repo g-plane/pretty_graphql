@@ -16,15 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo test --all-features
 
   docs:
@@ -42,6 +33,6 @@ jobs:
           echo `pwd`/mdbook >> $GITHUB_PATH
       - run: mdbook build docs
       - name: Deploy Production
-        run: netlify deploy --dir=docs/book --site=pretty-graphql --prod
+        run: netlify deploy --dir=docs/book --site=b7c276ad-9b01-4ca4-be50-c273cba89c1f --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
