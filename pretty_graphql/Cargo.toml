@@ -11,15 +11,15 @@ exclude = ["/tests"]
 
 [dependencies]
 apollo-parser = "0.8"
-memchr = "2.7"
+memchr = "2.8"
 rowan = "0.16"
 serde = { version = "1.0", features = ["derive"], optional = true }
-tiny_pretty = "0.2"
+tiny_pretty = "0.4"
 
 [dev-dependencies]
-insta = { version = "1.39", features = ["glob"] }
+insta = { version = "1.48", features = ["glob"] }
 serde_json = "1.0"
-similar-asserts = "1.5"
+similar-asserts = "2.0"
 
 [features]
 config_serde = ["serde"]
