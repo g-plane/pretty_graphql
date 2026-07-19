@@ -1,4 +1,4 @@
-use insta::{assert_snapshot, glob, Settings};
+use insta::{Settings, assert_snapshot, glob};
 use pretty_graphql::{config::FormatOptions, format_text};
 use serde::Deserialize;
 use std::{collections::HashMap, fs, path::Path};

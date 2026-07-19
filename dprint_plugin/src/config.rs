@@ -1,6 +1,6 @@
 use dprint_core::configuration::{
-    get_nullable_value, get_unknown_property_diagnostics, get_value, ConfigKeyMap,
-    ConfigurationDiagnostic, GlobalConfiguration, NewLineKind, ResolveConfigurationResult,
+    ConfigKeyMap, ConfigurationDiagnostic, GlobalConfiguration, NewLineKind,
+    ResolveConfigurationResult, get_nullable_value, get_unknown_property_diagnostics, get_value,
 };
 use pretty_graphql::config::*;
 

@@ -1,5 +1,5 @@
 use crate::config::{Comma, LanguageOptions, SingleLine};
-use apollo_parser::{cst::*, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, S};
+use apollo_parser::{S, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, cst::*};
 use rowan::Direction;
 use tiny_pretty::Doc;
 
@@ -296,21 +296,19 @@ impl DocGen for Document {
                     SyntaxKind::COMMENT => {
                         docs.push(format_comment(token.to_string(), ctx));
                     }
-                    SyntaxKind::WHITESPACE => {
-                        if token.index() > 0 && children.peek().is_some() {
-                            match token.text().chars().filter(|c| *c == '\n').count() {
-                                0 => {
-                                    if prev_kind == SyntaxKind::COMMENT {
-                                        docs.push(Doc::hard_line());
-                                    }
-                                }
-                                1 => {
+                    SyntaxKind::WHITESPACE if token.index() > 0 && children.peek().is_some() => {
+                        match token.text().chars().filter(|c| *c == '\n').count() {
+                            0 => {
+                                if prev_kind == SyntaxKind::COMMENT {
                                     docs.push(Doc::hard_line());
                                 }
-                                _ => {
-                                    docs.push(Doc::empty_line());
-                                    docs.push(Doc::hard_line());
-                                }
+                            }
+                            1 => {
+                                docs.push(Doc::hard_line());
+                            }
+                            _ => {
+                                docs.push(Doc::empty_line());
+                                docs.push(Doc::hard_line());
                             }
                         }
                     }

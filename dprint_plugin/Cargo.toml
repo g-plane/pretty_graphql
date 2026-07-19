@@ -1,7 +1,7 @@
 [package]
 name = "dprint_plugin_graphql"
 version = "0.2.3"
-edition = "2021"
+edition = "2024"
 authors = ["Pig Fang <g-plane@hotmail.com>"]
 description = "pretty_graphql as dprint plugin."
 repository = "https://github.com/g-plane/pretty_graphql"

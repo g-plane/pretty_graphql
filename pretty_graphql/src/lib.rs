@@ -5,8 +5,8 @@ use crate::{
     config::FormatOptions,
     printer::{Ctx, DocGen},
 };
-use apollo_parser::{cst::Document, Parser};
-use tiny_pretty::{print, IndentKind, PrintOptions};
+use apollo_parser::{Parser, cst::Document};
+use tiny_pretty::{IndentKind, PrintOptions, print};
 
 pub mod config;
 mod error;
