@@ -15,9 +15,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     };
 
-    match format_text(&input, &options) {
-        Ok(formatted) => print!("{formatted}"),
-        Err(error) => println!("{error}"),
-    }
+    print!("{}", format_text(&input, &options));
     Ok(())
 }

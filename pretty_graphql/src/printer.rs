@@ -44,7 +44,9 @@ impl DocGen for Argument {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(value.doc(ctx));
+            trivias = format_trivias_after_node(&value, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -238,7 +240,9 @@ impl DocGen for DirectiveDefinition {
                 docs.append(&mut trivias);
                 docs.push(directive_locations.doc(ctx).nest(ctx.indent_width));
             }
+            trivias = format_trivias_after_node(&directive_locations, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -376,7 +380,9 @@ impl DocGen for EnumTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(enum_values_def.doc(ctx));
+            trivias = format_trivias_after_node(&enum_values_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -419,7 +425,9 @@ impl DocGen for EnumTypeExtension {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(enum_values_def.doc(ctx));
+            trivias = format_trivias_after_node(&enum_values_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -456,7 +464,9 @@ impl DocGen for EnumValueDefinition {
                 docs.append(&mut trivias);
                 docs.push(directives.doc(ctx).group());
             }
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -525,7 +535,9 @@ impl DocGen for Field {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
+            trivias = format_trivias_after_node(&selection_set, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -578,7 +590,9 @@ impl DocGen for FieldDefinition {
                 docs.append(&mut trivias);
                 docs.push(directives.doc(ctx).group());
             }
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -647,7 +661,9 @@ impl DocGen for FragmentDefinition {
                 docs.append(&mut trivias);
             }
             docs.push(selection_set.doc(ctx));
+            trivias = format_trivias_after_node(&selection_set, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -686,7 +702,9 @@ impl DocGen for FragmentSpread {
                     .group()
                     .nest(ctx.indent_width),
             );
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -758,7 +776,9 @@ impl DocGen for InlineFragment {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
+            trivias = format_trivias_after_node(&selection_set, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -830,7 +850,9 @@ impl DocGen for InputObjectTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(input_fields_def.doc(ctx));
+            trivias = format_trivias_after_node(&input_fields_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -873,7 +895,9 @@ impl DocGen for InputObjectTypeExtension {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(input_fields_def.doc(ctx));
+            trivias = format_trivias_after_node(&input_fields_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -927,7 +951,9 @@ impl DocGen for InputValueDefinition {
                 docs.append(&mut trivias);
                 docs.push(directives.doc(ctx).group());
             }
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -982,7 +1008,9 @@ impl DocGen for InterfaceTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(fields_def.doc(ctx));
+            trivias = format_trivias_after_node(&fields_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1031,7 +1059,9 @@ impl DocGen for InterfaceTypeExtension {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(fields_def.doc(ctx));
+            trivias = format_trivias_after_node(&fields_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1131,7 +1161,9 @@ impl DocGen for ObjectField {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(value.doc(ctx));
+            trivias = format_trivias_after_node(&value, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1193,7 +1225,9 @@ impl DocGen for ObjectTypeDefinition {
             }
             docs.append(&mut trivias);
             docs.push(fields_def.doc(ctx));
+            trivias = format_trivias_after_node(&fields_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1249,7 +1283,9 @@ impl DocGen for ObjectTypeExtension {
             }
             docs.append(&mut trivias);
             docs.push(fields_def.doc(ctx));
+            trivias = format_trivias_after_node(&fields_def, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1313,7 +1349,9 @@ impl DocGen for OperationDefinition {
             }
             docs.append(&mut trivias);
             docs.push(selection_set.doc(ctx));
+            trivias = format_trivias_after_node(&selection_set, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1350,7 +1388,9 @@ impl DocGen for RootOperationTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(named_type.doc(ctx));
+            trivias = format_trivias_after_node(&named_type, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1393,7 +1433,9 @@ impl DocGen for ScalarTypeDefinition {
                 docs.append(&mut trivias);
                 docs.push(directives.doc(ctx).group());
             }
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1428,7 +1470,9 @@ impl DocGen for ScalarTypeExtension {
                 docs.append(&mut trivias);
                 docs.push(directives.doc(ctx).group());
             }
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1495,6 +1539,10 @@ impl DocGen for SchemaDefinition {
                 ))
             });
         }
+        if let Some(r_curly) = self.r_curly_token() {
+            trivias = format_trivias_after_token(&r_curly, ctx);
+        }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1553,6 +1601,10 @@ impl DocGen for SchemaExtension {
                 ))
             });
         }
+        if let Some(r_curly) = self.r_curly_token() {
+            trivias = format_trivias_after_token(&r_curly, ctx);
+        }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1626,7 +1678,9 @@ impl DocGen for TypeCondition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(named_type.doc(ctx));
+            trivias = format_trivias_after_node(&named_type, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1705,7 +1759,9 @@ impl DocGen for UnionTypeDefinition {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(union_member_types.doc(ctx).nest(ctx.indent_width));
+            trivias = format_trivias_after_node(&union_member_types, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1748,7 +1804,9 @@ impl DocGen for UnionTypeExtension {
             docs.push(Doc::space());
             docs.append(&mut trivias);
             docs.push(union_member_types.doc(ctx).nest(ctx.indent_width));
+            trivias = format_trivias_after_node(&union_member_types, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -1813,7 +1871,9 @@ impl DocGen for VariableDefinition {
                 docs.append(&mut trivias);
                 docs.push(directives.doc(ctx).group());
             }
+            trivias = format_trivias_after_node(&directives, ctx);
         }
+        docs.append(&mut trivias);
 
         Doc::list(docs)
     }
@@ -2350,8 +2410,10 @@ fn format_trivias(
         .skip_while(|element| skip_first_ws && element.kind() == SyntaxKind::WHITESPACE)
         .map_while(|element| match element {
             SyntaxElement::Token(token)
-                if token.kind() == SyntaxKind::WHITESPACE
-                    || token.kind() == SyntaxKind::COMMENT =>
+                if matches!(
+                    token.kind(),
+                    SyntaxKind::WHITESPACE | SyntaxKind::COMMENT | SyntaxKind::ERROR
+                ) =>
             {
                 Some(token)
             }
@@ -2396,6 +2458,9 @@ fn format_trivias(
             SyntaxKind::COMMENT => {
                 docs.push(format_comment(token.to_string(), ctx));
                 *has_comment = true;
+            }
+            SyntaxKind::ERROR => {
+                docs.push(Doc::text(token.to_string()));
             }
             _ => {}
         }

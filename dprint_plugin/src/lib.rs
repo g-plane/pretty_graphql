@@ -59,10 +59,7 @@ impl SyncPluginHandler<FormatOptions> for PrettyGraphqlPluginHandler {
         _: impl FnMut(&Path, Vec<u8>, &ConfigKeyMap) -> Result<Option<Vec<u8>>>,
     ) -> Result<Option<Vec<u8>>> {
         let format_result = format_text(std::str::from_utf8(&file_text)?, config);
-        match format_result {
-            Ok(code) => Ok(Some(code.into_bytes())),
-            Err(err) => Err(err.into()),
-        }
+        Ok(Some(format_result.into_bytes()))
     }
 }
 

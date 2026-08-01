@@ -43,9 +43,7 @@ fn fmt_snapshot() {
 }
 
 fn run_format_test(path: &Path, input: &str, options: &FormatOptions) -> String {
-    let output = format_text(input, options)
-        .map_err(|err| format!("failed to format '{}': {:?}", path.display(), err))
-        .unwrap();
+    let output = format_text(input, options);
 
     assert!(
         !output.contains(" \n"),
@@ -53,15 +51,7 @@ fn run_format_test(path: &Path, input: &str, options: &FormatOptions) -> String 
         path.display()
     );
 
-    let regression_format = format_text(&output, options)
-        .map_err(|err| {
-            format!(
-                "syntax error in stability test '{}': {:?}",
-                path.display(),
-                err
-            )
-        })
-        .unwrap();
+    let regression_format = format_text(&output, options);
     similar_asserts::assert_eq!(
         output,
         regression_format,

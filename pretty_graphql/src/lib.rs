@@ -12,19 +12,10 @@ pub mod config;
 mod error;
 mod printer;
 
+#[inline]
 /// Format the given source input.
-pub fn format_text(input: &str, options: &FormatOptions) -> Result<String, Error> {
-    let parser = Parser::new(input);
-    let cst = parser.parse();
-    let errors = cst.errors().cloned().collect::<Vec<_>>();
-    if errors.is_empty() {
-        Ok(print_tree(&cst.document(), options))
-    } else {
-        Err(Error {
-            errors,
-            input: input.to_owned(),
-        })
-    }
+pub fn format_text(input: &str, options: &FormatOptions) -> String {
+    print_tree(&Parser::new(input).parse().document(), options)
 }
 
 /// Print the given concrete syntax tree.

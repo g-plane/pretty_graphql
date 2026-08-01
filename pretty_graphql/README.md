@@ -8,20 +8,11 @@ You can format source code string by using [`format_text`] function.
 use pretty_graphql::{config::FormatOptions, format_text};
 
 let options = FormatOptions::default();
-assert_eq!("{\n  field\n}\n", &format_text("{ field }", &options).unwrap());
+assert_eq!("{\n  field\n}\n", &format_text("{ field }", &options));
 ```
 
 For detailed documentation of configuration,
 please read [configuration documentation](https://pretty-graphql.netlify.app/).
-
-If there're syntax errors in source code, it will return `Err`:
-
-```rust
-use pretty_graphql::{config::FormatOptions, format_text};
-
-let options = FormatOptions::default();
-assert!(format_text("{", &options).is_err());
-```
 
 ## Print Syntax Tree
 
